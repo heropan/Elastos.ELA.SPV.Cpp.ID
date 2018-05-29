@@ -1,0 +1,4 @@
+[submodule "ThirdParty/Elastos.ELA.SPV.Cpp"]
+	path = ThirdParty/Elastos.ELA.SPV.Cpp
+	url = git@github.com:elastos/Elastos.ELA.SPV.Cpp.git
+	branch = dev

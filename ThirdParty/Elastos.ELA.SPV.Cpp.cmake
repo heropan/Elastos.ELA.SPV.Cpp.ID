@@ -1,0 +1,9 @@
+
+set(
+	ThirdParty_SPVSDK_INC_DIR
+	${ThirdParty_INC_DIRS}
+	${SPVCORE_INC_DIRS}
+	${SPVSDK_INC_DIRS}
+	${SPVJNI_INC_DIRS}
+	${INTERFACE_INC_DIRS}
+)

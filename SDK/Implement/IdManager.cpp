@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "Core/BRAddress.h"
+//#include "Core/BRAddress.h"
 
 #include "IdManager.h"
 #include "SDK/Wrapper/Key.h"
