@@ -25,7 +25,7 @@ add_library(
 	${SDK_IMPL_SOURCE_FILES}
 )
 
-target_link_libraries(idchain spvsdk)
-add_dependencies(idchain spvsdk)
+target_link_libraries(idchain spvsdk leveldb)
+add_dependencies(idchain spvsdk leveldb)
 
 add_subdirectory(Sample)

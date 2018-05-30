@@ -1,9 +1,11 @@
 
 #include <iostream>
+#include <cassert>
 #include <boost/scoped_ptr.hpp>
 
 #include "WalletFactory.h"
 #include "IdManager.h"
+#include "leveldb/db.h"
 
 using namespace Elastos::SDK;
 
