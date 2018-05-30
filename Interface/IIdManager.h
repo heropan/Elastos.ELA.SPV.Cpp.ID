@@ -13,11 +13,11 @@ namespace Elastos {
 		class IIdManager {
 		public:
 
-			virtual nlohmann::json GenerateId(std::string &id, std::string &privateKey) = 0;
+			virtual nlohmann::json GenerateId(std::string &id, std::string &privateKey) const = 0;
 
-			virtual nlohmann::json getLastIdValue(const std::string &path) = 0;
+			virtual nlohmann::json GetLastIdValue(const std::string &id, const std::string &path) const = 0;
 
-			virtual nlohmann::json getIdHistoryValues(const std::string &id, const std::string &path) = 0;
+			virtual nlohmann::json GetIdHistoryValues(const std::string &id, const std::string &path) = 0;
 
 			virtual void AddCallback(IIdManagerCallback *managerCallback) = 0;
 

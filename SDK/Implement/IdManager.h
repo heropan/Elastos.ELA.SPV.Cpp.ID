@@ -10,29 +10,45 @@
 #include "nlohmann/json.hpp"
 
 #include "Interface/IIdManager.h"
+#include "Interface/IIdChainSubWallet.h"
 
 namespace Elastos {
 	namespace SDK {
 
-		class IdManager : public IIdManager {
+		class IdManager : public IIdManager, public ISubWalletCallback {
 		public:
-			IdManager();
+			IdManager(IIdChainSubWallet *subWallet);
 
 			virtual ~IdManager();
 
-			virtual nlohmann::json GenerateId(std::string &id, std::string &privateKey);
+			virtual nlohmann::json GenerateId(std::string &id, std::string &privateKey) const;
 
-			virtual nlohmann::json getLastIdValue(const std::string &path);
+			virtual nlohmann::json GetLastIdValue(const std::string &id, const std::string &path) const;
 
-			virtual nlohmann::json getIdHistoryValues(const std::string &id, const std::string &path);
+			virtual nlohmann::json GetIdHistoryValues(const std::string &id, const std::string &path);
 
 			virtual void AddCallback(IIdManagerCallback *managerCallback);
 
 			virtual void RemoveCallback(IIdManagerCallback *managerCallback);
 
-		private:
+			virtual void OnTransactionStatusChanged(
+					const std::string &txid,
+					const std::string &status,
+					const nlohmann::json &desc,
+					uint32_t confirms);
+
+		protected:
+			void tryInitialize() const;
+
+			void updateDatabase(const std::string &id,
+								const std::string &path,
+								const nlohmann::json &value,
+								uint32_t blockHeight);
+
+		protected:
 
 			std::vector<IIdManagerCallback *> _callbacks;
+			IIdChainSubWallet *_subWallet;
 		};
 
 	}
