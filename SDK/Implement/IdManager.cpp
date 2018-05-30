@@ -4,11 +4,11 @@
 
 //#include "Core/BRAddress.h"
 
-#include <ThirdParty/Elastos.ELA.SPV.Cpp/SDK/ELACoreExt/Payload/PayloadIdChain.h>
 #include "IdManager.h"
 #include "SDK/Wrapper/Key.h"
 #include "SDK/Common/Utils.h"
 #include "SDK/Implement/IdChainSubWallet.h"
+#include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
 
 namespace Elastos {
 	namespace SDK {
@@ -97,11 +97,12 @@ namespace Elastos {
 						return transaction->getTransactionType() == Transaction::RegisterIdentification;
 					});
 			std::for_each(transactions.begin(), transactions.end(),
-				[](const TransactionPtr &transaction){
-				PayloadIdChain *payload = static_cast<PayloadIdChain *>(transaction->getPayload().get());
-				uint32_t blockHeight = transaction->getBlockHeight();
-				//todo store in data base
-			});
+						  [](const TransactionPtr &transaction) {
+							  PayloadRegisterIdentification *payload =
+									  static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get());
+							  uint32_t blockHeight = transaction->getBlockHeight();
+							  //todo store in data base
+						  });
 		}
 
 		void IdManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,
