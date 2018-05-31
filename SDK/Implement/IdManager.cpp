@@ -67,11 +67,16 @@ namespace Elastos {
 
 		void IdManager::OnTransactionStatusChanged(const std::string &txid, const std::string &status,
 												   const nlohmann::json &desc, uint32_t confirms) {
+			if(desc.find("ID") == desc.end() || desc.find("Path") == desc.end())
+				return;
+
 			std::string id = desc["ID"].get<std::string>();
 			std::string path = desc["Path"].get<std::string>();
 			nlohmann::json value;
 			if (status == "Added" || status == "Updated") {
-				value = desc["Value"];
+				value.push_back(desc["DataHash"]);
+				value.push_back(desc["Proof"]);
+				value.push_back(desc["Sign"]);
 			} else if (status == "Deleted") {
 				value = GetLastIdValue(id, path);
 			}
