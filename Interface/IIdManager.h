@@ -5,6 +5,7 @@
 #ifndef __ELASTOS_SDK_IIDMANAGER_H__
 #define __ELASTOS_SDK_IIDMANAGER_H__
 
+#include "IIdChainSubWallet.h"
 #include "IIdManagerCallback.h"
 
 namespace Elastos {
@@ -13,15 +14,44 @@ namespace Elastos {
 		class IIdManager {
 		public:
 
-			virtual nlohmann::json GenerateId(std::string &id, std::string &privateKey) const = 0;
+			virtual bool InitIdCache(
+					IIdChainSubWallet *subWallet) = 0;
 
-			virtual nlohmann::json GetLastIdValue(const std::string &id, const std::string &path) const = 0;
+			virtual bool RegisterId(
+					const std::string &id,
+					const std::string &key,
+					const std::string &password) = 0;
 
-			virtual nlohmann::json GetIdHistoryValues(const std::string &id, const std::string &path) = 0;
+			virtual nlohmann::json GetLastIdValue(
+					const std::string &id,
+					const std::string &path) const = 0;
 
-			virtual void AddCallback(IIdManagerCallback *managerCallback) = 0;
+			virtual nlohmann::json GetIdHistoryValues(
+					const std::string &id,
+					const std::string &path) const = 0;
 
-			virtual void RemoveCallback(IIdManagerCallback *managerCallback) = 0;
+			virtual std::string Sign(
+					const std::string &id,
+					const std::string &message,
+					const std::string &password) = 0;
+
+			virtual nlohmann::json CheckSign(
+					const std::string &publicKey,
+					const std::string &message,
+					const std::string &signature) = 0;
+
+			virtual nlohmann::json GenerateProgram(
+					const std::string &id,
+					const std::string &message,
+					const std::string &password) = 0;
+
+			virtual bool RegisterCallback(
+					const std::string &id,
+					IIdManagerCallback *callback,
+					IIdChainSubWallet *subWallet) = 0;
+
+			virtual bool UnregisterCallback(
+					const std::string &id) = 0;
 		};
 
 	}
