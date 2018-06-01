@@ -52,6 +52,8 @@ namespace Elastos {
 							  uint32_t blockHeight = transaction->getBlockHeight();
 							  //todo store in data base
 						  });
+
+			return true;
 		}
 
 		void IdManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,

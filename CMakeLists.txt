@@ -1,3 +1,7 @@
+# Copyright (c) 2012-2018 The Elastos Open Source Project
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -5,9 +9,30 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# Define helper macro option_with_default
+macro(option_with_default OPTION_NAME OPTION_STRING OPTION_DEFAULT)
+	if(NOT DEFINED ${OPTION_NAME})
+		set(${OPTION_NAME} ${OPTION_DEFAULT})
+	endif(NOT DEFINED ${OPTION_NAME})
+	option(${OPTION_NAME} "${OPTION_STRING}" ${${OPTION_NAME}})
+endmacro(option_with_default OPTION_NAME OPTION_STRING OPTION_DEFAULT)
+
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type." FORCE)
+endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Release Debug RelWithDebInfo MinSizeRel)
+
 project(idchain)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
+
+set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELEASE NDEBUG)
+set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_MINSIZEREL NDEBUG)
+set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO NDEBUG)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_definitions(-DSPDLOG_DEBUG_ON)
+endif()
 
 add_subdirectory(Interface)
 add_subdirectory(SDK)
@@ -29,3 +54,4 @@ target_link_libraries(idchain spvsdk leveldb)
 add_dependencies(idchain spvsdk leveldb)
 
 add_subdirectory(Sample)
+add_subdirectory(Test)
