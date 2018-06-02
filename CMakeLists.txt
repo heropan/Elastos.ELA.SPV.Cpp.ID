@@ -26,6 +26,9 @@ project(idchain)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
+option_with_default(IDCHAIN_BUILD_TEST_CASES "Build test cases" ON)
+option_with_default(IDCHAIN_BUILD_SAMPLE "Build sample" ON)
+
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELEASE NDEBUG)
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_MINSIZEREL NDEBUG)
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO NDEBUG)
@@ -53,5 +56,10 @@ add_library(
 target_link_libraries(idchain spvsdk leveldb)
 add_dependencies(idchain spvsdk leveldb)
 
-add_subdirectory(Sample)
-add_subdirectory(Test)
+if (IDCHAIN_BUILD_SAMPLE)
+	add_subdirectory(Sample)
+endif()
+
+if(IDCHAIN_BUILD_TEST_CASES)
+	add_subdirectory(Test)
+endif()
