@@ -20,6 +20,7 @@ foreach(src ${IDTEST_SOURCE_FILES})
 	else()
 		set(AUTO_TEST_COMMAND ${AUTO_TEST_COMMAND} && ./${IDTEST_TARGET_NAME})
 	endif()
+	add_dependencies(idchain_auto_test ${IDTEST_TARGET_NAME})
 
 	if(ANDROID)
 		target_link_libraries(${IDTEST_TARGET_NAME} log atomic)
@@ -32,3 +33,4 @@ add_custom_command(
 	COMMAND ${AUTO_TEST_COMMAND}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
+

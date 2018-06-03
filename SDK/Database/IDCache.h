@@ -14,7 +14,6 @@ namespace Elastos {
 	namespace SDK {
 
 		typedef std::map<std::string, nlohmann::json> IDPathMap;
-		typedef std::map<uint32_t, nlohmann::json> IDHeightMap;
 
 		class IDCache {
 		public:
@@ -44,6 +43,5 @@ namespace Elastos {
 
 	}
 }
-
 
 #endif //__ELASTOS_SDK_IDCACHE_H

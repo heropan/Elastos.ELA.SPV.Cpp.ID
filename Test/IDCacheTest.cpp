@@ -34,7 +34,7 @@ TEST_CASE( "IDCache test", "[IDCache]" )
 		}
 	}
 
-	SECTION("IDCache put map test") {
+	SECTION("IDCache put map indexed by id") {
 #if 0
 		put some json like this:
 			"id1":[
@@ -81,7 +81,7 @@ TEST_CASE( "IDCache test", "[IDCache]" )
 		}
 	}
 
-	SECTION("IDCache get map test") {
+	SECTION("IDCache get map indexed by id") {
 		IDCache idCache(IDCachePath);
 		IDPathMap pathMap;
 		std::ostringstream ss;
@@ -92,7 +92,7 @@ TEST_CASE( "IDCache test", "[IDCache]" )
 			ss << id;
 			REQUIRE(idCache.Get(tagKeyIDPrefix + ss.str(), pathMap));
 			REQUIRE(howManyPath == pathMap.size());
-			Log::getLogger()->info("{}", tagKeyIDPrefix + ss.str());
+//			Log::getLogger()->info("{}", tagKeyIDPrefix + ss.str());
 			for (int path = 1; path <= howManyPath; ++path) {
 				ss.str("");
 				ss << path;
@@ -100,7 +100,7 @@ TEST_CASE( "IDCache test", "[IDCache]" )
 				REQUIRE(found);
 				nlohmann::json getJson;
 				getJson = pathMap[tagKeyPathPrefix + ss.str()];
-				Log::getLogger()->info("\"{}\": {}", tagKeyPathPrefix + ss.str(), getJson.dump());
+//				Log::getLogger()->info("\"{}\": {}", tagKeyPathPrefix + ss.str(), getJson.dump());
 
 				ss.str("");
 				ss << ((id - 1) * howManyPath + path);
@@ -110,10 +110,166 @@ TEST_CASE( "IDCache test", "[IDCache]" )
 				REQUIRE(getJson[tagBlockHeight].get<uint32_t>() == ((id - 1) * howManyPath + path));
 			}
 		}
+
+		REQUIRE(!idCache.Get("idNotFound", pathMap));
 	}
 
 	SECTION("IDCache put a json indexed by id and path") {
+		IDCache idCache(IDCachePath);
 
+		nlohmann::json putJson;
+		putJson[tagDataHash]    = "DataHash+1";
+		putJson[tagProof]       = "Proof+1";
+		putJson[tagSign]        = "Sign+1";
+		putJson[tagBlockHeight] = 110;
+		REQUIRE(idCache.Put("id1", "path4", putJson));
+
+		putJson[tagDataHash]    = "DataHash+2";
+		putJson[tagProof]       = "Proof+2";
+		putJson[tagSign]        = "Sign+2";
+		putJson[tagBlockHeight] = 120;
+		REQUIRE(idCache.Put("id2", "path5", putJson));
+
+		putJson[tagDataHash]    = "DataHash+3";
+		putJson[tagProof]       = "Proof+3";
+		putJson[tagSign]        = "Sign+3";
+		putJson[tagBlockHeight] = 130;
+		REQUIRE(idCache.Put("id3", "path2", putJson));
+	}
+
+	SECTION("IDCache get a json indexed by id and path") {
+		IDCache idCache(IDCachePath);
+		nlohmann::json getJson;
+
+		REQUIRE(idCache.Get("id1", "path4", getJson));
+//		Log::getLogger()->info("json: {}", getJson.dump());
+		REQUIRE(getJson[tagDataHash].get<std::string>() == "DataHash+1");
+		REQUIRE(getJson[tagProof].get<std::string>() == "Proof+1");
+		REQUIRE(getJson[tagSign].get<std::string>() == "Sign+1");
+		REQUIRE(getJson[tagBlockHeight].get<uint32_t>() == 110);
+		REQUIRE(!idCache.Get("id1", "pathNotFound", getJson));
+
+		REQUIRE(idCache.Get("id2", "path5", getJson));
+		REQUIRE(getJson[tagDataHash].get<std::string>() == "DataHash+2");
+		REQUIRE(getJson[tagProof].get<std::string>() == "Proof+2");
+		REQUIRE(getJson[tagSign].get<std::string>() == "Sign+2");
+		REQUIRE(getJson[tagBlockHeight].get<uint32_t>() == 120);
+		REQUIRE(!idCache.Get("id2", "pathNotFound", getJson));
+
+		REQUIRE(idCache.Get("id3", "path2", getJson));
+		REQUIRE(getJson[tagDataHash].get<std::string>() == "DataHash+3");
+		REQUIRE(getJson[tagProof].get<std::string>() == "Proof+3");
+		REQUIRE(getJson[tagSign].get<std::string>() == "Sign+3");
+		REQUIRE(getJson[tagBlockHeight].get<uint32_t>() == 130);
+		REQUIRE(!idCache.Get("id3", "pathNotFound", getJson));
+	}
+
+	SECTION("IDCache move a josn indexed by id and path") {
+		IDCache idCache(IDCachePath);
+
+		IDPathMap pathMapFrom, pathMapTo, pathMapVerify;
+		nlohmann::json jsonMoved, jsonTmp;
+		REQUIRE(idCache.Get("id1", pathMapFrom));
+		jsonMoved = pathMapFrom["path1"];
+		REQUIRE(idCache.Get("id2", pathMapTo));
+		REQUIRE(idCache.Move("id1", "path1", "id2", "path1"));
+		for (IDPathMap::iterator it = pathMapFrom.begin(); it != pathMapFrom.end(); it++) {
+			jsonTmp.clear();
+			if (it->first == "path1") {
+				REQUIRE(!idCache.Get("id1", it->first, jsonTmp));
+			} else {
+				REQUIRE(idCache.Get("id1", it->first, jsonTmp));
+				REQUIRE(jsonTmp == it->second);
+			}
+		}
+
+		for (IDPathMap::iterator it = pathMapTo.begin(); it != pathMapTo.end(); it++) {
+			jsonTmp.clear();
+			REQUIRE(idCache.Get("id2", it->first, jsonTmp));
+			if (it->first == "path1") {
+				REQUIRE(jsonTmp == jsonMoved);
+			} else {
+				REQUIRE(pathMapTo[it->first] == jsonTmp);
+			}
+		}
+	}
+
+	SECTION("IDCache delete a json indexed by id and path") {
+		IDCache idCache(IDCachePath);
+		IDPathMap pathMap;
+		nlohmann::json getJson;
+
+		REQUIRE(idCache.Get("id1", pathMap));
+		REQUIRE(idCache.Delete("id1", "path1"));
+		for (IDPathMap::iterator it = pathMap.begin(); it != pathMap.end(); it++) {
+			if (it->first == "path1") {
+				REQUIRE(!idCache.Get("id1", it->first, getJson));
+			} else {
+				REQUIRE(idCache.Get("id1", it->first, getJson));
+				REQUIRE(it->second == getJson);
+			}
+		}
+
+		pathMap.clear();
+		getJson.clear();
+		REQUIRE(idCache.Get("id2", pathMap));
+		REQUIRE(idCache.Delete("id2", "path3"));
+		for (IDPathMap::iterator it = pathMap.begin(); it != pathMap.end(); it++) {
+			if (it->first == "path3") {
+				REQUIRE(!idCache.Get("id2", it->first, getJson));
+			} else {
+				REQUIRE(idCache.Get("id2", it->first, getJson));
+				REQUIRE(it->second == getJson);
+			}
+		}
+
+		pathMap.clear();
+		getJson.clear();
+		REQUIRE(idCache.Get("id3", pathMap));
+		REQUIRE(idCache.Delete("id3", "pathNotFound"));
+		for (IDPathMap::iterator it = pathMap.begin(); it != pathMap.end(); it++) {
+			if (it->first == "pathNotFound") {
+				REQUIRE(!idCache.Get("id3", it->first, getJson));
+			} else {
+				REQUIRE(idCache.Get("id3", it->first, getJson));
+				REQUIRE(it->second == getJson);
+			}
+		}
+	}
+
+	SECTION("IDCache move a map indexed by id") {
+		IDCache idCache(IDCachePath);
+		IDPathMap pathMapFrom, pathMapTo, pathMaptmp;
+
+		REQUIRE(idCache.Get("id1", pathMapFrom));
+		REQUIRE(idCache.Move("id1", "id2"));
+		REQUIRE(!idCache.Get("id1", pathMaptmp));
+		REQUIRE(idCache.Get("id2", pathMapTo));
+		REQUIRE(pathMapFrom.size() == pathMapTo.size());
+		for (IDPathMap::iterator it = pathMapFrom.begin(); it != pathMapFrom.end(); it++) {
+			REQUIRE(pathMapFrom[it->first] == pathMapTo[it->first]);
+		}
+	}
+
+	SECTION("IDCache delete a map indexed by id") {
+		IDCache idCache(IDCachePath);
+		IDPathMap pathMap;
+
+		REQUIRE(idCache.Delete("id2"));
+		REQUIRE(!idCache.Get("id2", pathMap));
+		REQUIRE(idCache.Delete("id2"));
+	}
+
+	SECTION("IDCache delete all") {
+		IDCache idCache(IDCachePath);
+		IDPathMap pathMap;
+
+		REQUIRE(idCache.DeleteAll());
+		REQUIRE(!idCache.Get("id1", pathMap));
+		REQUIRE(!idCache.Get("id2", pathMap));
+		REQUIRE(!idCache.Get("id3", pathMap));
+		REQUIRE(!idCache.Get("id4", pathMap));
+		REQUIRE(!idCache.Get("id5", pathMap));
 	}
 
 }

@@ -123,7 +123,13 @@ namespace Elastos {
 				return false;
 			}
 
-			j = nlohmann::json::parse(value);
+			nlohmann::json idJson = nlohmann::json::parse(value);
+			if (idJson.find(path) == idJson.end()) {
+				Log::getLogger()->error("IDCache get id={}, path={} error: not found", id, path);
+				return false;
+			}
+
+			j = idJson[path];
 
 			return true;
 		}
@@ -207,11 +213,15 @@ namespace Elastos {
 			std::string value;
 			leveldb::Status s = _db->Get(leveldb::ReadOptions(), idFrom, &value);
 			if (!s.ok()) {
-				Log::getLogger()->error("IDCache get id={} error: {}", idFrom, s.ToString());
+				Log::getLogger()->error("IDCache move idFrom={} error: {}", idFrom, s.ToString());
 				return false;
 			}
 
 			jsonGet = nlohmann::json::parse(value);
+			if (jsonGet.find(pathFrom) == jsonGet.end()) {
+				Log::getLogger()->error("IDCache move idFrom={}, pathFrom={} error: path not found", idFrom, pathFrom);
+				return false;
+			}
 			jsonToMove = jsonGet[pathFrom];
 
 			jsonGet.erase(pathFrom);
@@ -224,7 +234,7 @@ namespace Elastos {
 			s = _db->Get(leveldb::ReadOptions(), idTo, &value);
 			if (!s.ok()) {
 				if (!s.IsNotFound()) {
-					Log::getLogger()->error("IDCache get id={} error: {}", idTo, s.ToString());
+					Log::getLogger()->error("IDCache move idTo={} error: {}", idTo, s.ToString());
 					return false;
 				}
 			} else {
@@ -254,7 +264,20 @@ namespace Elastos {
 		}
 
 		bool IDCache::DeleteAll() {
-			return false;
+			bool ok = true;
+
+			leveldb::Iterator *it = _db->NewIterator(leveldb::ReadOptions());
+			for (it->SeekToFirst(); it->Valid(); it->Next()) {
+				leveldb::Status s = _db->Delete(leveldb::WriteOptions(), it->key());
+				if (!s.ok()) {
+					Log::getLogger()->error("delete id={} error: {}", it->key().ToString(), s.ToString());
+					ok = false;
+					break;
+				}
+			}
+			delete it;
+
+			return ok;
 		}
 
 	}
