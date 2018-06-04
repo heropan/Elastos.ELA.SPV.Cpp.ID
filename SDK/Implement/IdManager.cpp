@@ -17,6 +17,7 @@
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
+#define IDCACHE_DIR_NAME "IdCache"
 
 namespace fs = boost::filesystem;
 
@@ -115,20 +116,37 @@ namespace Elastos {
 		}
 
 		nlohmann::json IdManager::GetLastIdValue(const std::string &id, const std::string &path) const {
-			//todo get from database
-			return nlohmann::json();
+			nlohmann::json jsonGet;
+			jsonGet = _idCache.Get(id, path);
+			if (jsonGet.empty()) {
+				return nlohmann::json();
+			}
+
+			nlohmann::json lastIdValue;
+			uint32_t blockHeight = 0;
+			for (nlohmann::json::iterator it = jsonGet.begin(); it != jsonGet.end(); it++) {
+				uint32_t getBlockHeight = (uint32_t)std::stoi(it.key(), nullptr, 10);
+				if (getBlockHeight > blockHeight) {
+					lastIdValue[it.key()] = it.value();
+					blockHeight = getBlockHeight;
+				}
+			}
+
+			return lastIdValue;
 		}
 
 		nlohmann::json IdManager::GetIdHistoryValues(const std::string &id, const std::string &path) const {
-			//todo get from database
-			return nlohmann::json();
+			return _idCache.Get(id, path);;
 		}
 
 		bool IdManager::initIdCache() {
-			//todo get status from database
-			bool hasInitialized = false;
-			if (hasInitialized) return true;
+			if (_idCache.Initialized())
+				return true;
 
+			fs::path idCachePath = _pathRoot;
+			idCachePath /= IDCACHE_DIR_NAME;
+
+			_idCache = IdCache(idCachePath);
 
 			SharedWrapperList<Transaction, BRTransaction *> transactions =
 					_walletManager->getTransactions(
@@ -136,11 +154,15 @@ namespace Elastos {
 								return transaction->getTransactionType() == Transaction::RegisterIdentification;
 							});
 			std::for_each(transactions.begin(), transactions.end(),
-						  [](const TransactionPtr &transaction) {
+						  [this](const TransactionPtr &transaction) {
 							  PayloadRegisterIdentification *payload =
 									  static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get());
 							  uint32_t blockHeight = transaction->getBlockHeight();
-							  //todo store in data base
+
+							  nlohmann::json jsonToSave = payload->toJson();
+							  jsonToSave.erase(payload->getId());
+							  jsonToSave.erase(payload->getPath());
+							  _idCache.Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
 						  });
 			return true;
 		}
@@ -149,11 +171,12 @@ namespace Elastos {
 									   uint32_t blockHeight) {
 			//todo consider block height equal INT_MAX(unconfirmed)
 			//todo parse proof, data hash, sign from value
-			//todo write to database
+
+			_idCache.Put(id, path, blockHeight, value);
 		}
 
 		void IdManager::removeIdItem(const std::string &id, const std::string &path, uint32_t blockHeight) {
-			//todo remove id value with specified path and block height
+			_idCache.Delete(id, path, blockHeight);
 		}
 
 		std::string IdManager::Sign(const std::string &id, const std::string &message, const std::string &password) {

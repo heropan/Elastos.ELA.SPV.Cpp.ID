@@ -43,6 +43,7 @@ std::string registerId(IIdManager *idManager) {
 		masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
 		idManager->RegisterId(id, key, idPassword);
 	}
+	return id;
 }
 
 int main(int argc, char *argv[]) {

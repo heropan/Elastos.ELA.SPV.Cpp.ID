@@ -2,9 +2,11 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+add_subdirectory(Elastos.ELA.SPV.Cpp)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(LEVELDB_BUILD_TESTS OFF)
 add_subdirectory(leveldb)
-add_subdirectory(Elastos.ELA.SPV.Cpp)
 
 include(Elastos.ELA.SPV.Cpp.cmake)
 include(leveldb.cmake)

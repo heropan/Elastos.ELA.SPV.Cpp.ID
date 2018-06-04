@@ -14,6 +14,7 @@
 #include "SDK/Common/CMemBlock.h"
 #include "SDK/Wrapper/Key.h"
 #include "SDK/Manager/WalletManager.h"
+#include "IdCache.h"
 
 namespace Elastos {
 	namespace SDK {
@@ -130,6 +131,7 @@ namespace Elastos {
 			SpvListenerPtr _spvListener;
 
 			std::string _pathRoot;
+			IdCache _idCache;
 		};
 
 	}
