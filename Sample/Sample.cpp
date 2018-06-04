@@ -7,10 +7,14 @@
 #include "WalletFactory.h"
 #include "IdManager.h"
 #include "leveldb/db.h"
+#include "Interface/IdManagerFactory.h"
 
 using namespace Elastos::SDK;
 
 #define PURPOSE 55
+
+IMasterWallet *masterWallet = nullptr;
+std::string payPassword = "payPassword";
 
 class TestCallback : public IIdManagerCallback {
 public:
@@ -22,31 +26,37 @@ public:
 	}
 };
 
-int main(int argc, char *argv[]) {
+void initMasterWallet() {
 	boost::scoped_ptr<WalletFactory> walletFactory(new WalletFactory);
 
 	std::string mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
 	std::string phrasePassword = "";
 	std::string payPassword = "payPassword";
-	IMasterWallet *masterWallet(
-			walletFactory->ImportWalletWithMnemonic(mnemonic, phrasePassword, payPassword));
+	masterWallet = walletFactory->ImportWalletWithMnemonic(mnemonic, phrasePassword, payPassword);
+}
 
-	ISubWallet *subWallet(masterWallet->CreateSubWallet(Idchain, "ELA", 0, payPassword, false));
-	IIdChainSubWallet *idChainSubWallet = dynamic_cast<IIdChainSubWallet *>(subWallet);
-
+std::string registerId(IIdManager *idManager) {
 	std::string idPassword = "idPassword";
-	IdManager *idManager(new IdManager);
 	std::string id;
 	{
 		std::string key;
 		masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
 		idManager->RegisterId(id, key, idPassword);
 	}
-	TestCallback callback;
-	idManager->RegisterCallback(id, &callback, idChainSubWallet);
+}
 
-	nlohmann::json addresses = subWallet->GetAllAddress(0, INT_MAX);
-	std::cout << "wallet addrs: " << addresses << std::endl;
+int main(int argc, char *argv[]) {
+
+	initMasterWallet();
+
+	std::vector<std::string> initialAddresses;
+	IdManagerFactory idManagerFactory;
+	IIdManager *idManager = idManagerFactory.CreateIdManager(initialAddresses);
+	std::string id = registerId(idManager);
+	std::cout << "Id address: " << id << std::endl;
+
+	TestCallback callback;
+	idManager->RegisterCallback(id, &callback);
 
 	while (true) sleep(1);
 }

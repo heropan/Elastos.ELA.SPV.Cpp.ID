@@ -14,13 +14,15 @@ namespace Elastos {
 		class IIdManager {
 		public:
 
-			virtual bool InitIdCache(
-					IIdChainSubWallet *subWallet) = 0;
-
-			virtual bool RegisterId(
+			virtual void RegisterId(
 					const std::string &id,
 					const std::string &key,
 					const std::string &password) = 0;
+
+			virtual void RecoverIds(
+					const std::vector<std::string> &ids,
+					const std::vector<std::string> &keys,
+					const std::vector<std::string> &passwords) = 0;
 
 			virtual nlohmann::json GetLastIdValue(
 					const std::string &id,
@@ -47,8 +49,7 @@ namespace Elastos {
 
 			virtual bool RegisterCallback(
 					const std::string &id,
-					IIdManagerCallback *callback,
-					IIdChainSubWallet *subWallet) = 0;
+					IIdManagerCallback *callback) = 0;
 
 			virtual bool UnregisterCallback(
 					const std::string &id) = 0;
