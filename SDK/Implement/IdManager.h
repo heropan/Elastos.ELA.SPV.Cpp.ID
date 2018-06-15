@@ -13,7 +13,7 @@
 #include "Interface/IIdManager.h"
 #include "SDK/Common/CMemBlock.h"
 #include "SDK/Wrapper/Key.h"
-#include "SDK/Manager/WalletManager.h"
+#include "SDK/SpvService/WalletManager.h"
 #include "IdCache.h"
 
 namespace Elastos {

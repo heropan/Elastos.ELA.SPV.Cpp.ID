@@ -13,7 +13,7 @@
 #include "SDK/Implement/MasterWallet.h"
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
-#include "SDK/ELACoreExt/ELABRTransaction.h"
+#include "SDK/ELACoreExt/ELATransaction.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
@@ -36,7 +36,7 @@ namespace Elastos {
 
 			virtual void onTxAdded(const TransactionPtr &transaction) {
 
-				if (transaction->getTransactionType() != Transaction::RegisterIdentification)
+				if (transaction->getTransactionType() != ELATransaction::RegisterIdentification)
 					return;
 
 				fireTransactionStatusChanged(
@@ -48,10 +48,10 @@ namespace Elastos {
 				BRTransaction *transaction = BRWalletTransactionForHash(
 						_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
 				if (transaction == nullptr ||
-					((ELABRTransaction *) transaction)->type != Transaction::RegisterIdentification)
+					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
 					return;
 
-				Transaction wrapperTx(transaction);
+				Transaction wrapperTx((ELATransaction *)transaction);
 				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
 						wrapperTx.getPayload().get());
 				fireTransactionStatusChanged(payload, SubWalletCallback::Updated, blockHeight);
@@ -61,10 +61,10 @@ namespace Elastos {
 				BRTransaction *transaction = BRWalletTransactionForHash(
 						_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
 				if (transaction == nullptr ||
-					((ELABRTransaction *) transaction)->type != Transaction::RegisterIdentification)
+					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
 					return;
 
-				Transaction wrapperTx(transaction);
+				Transaction wrapperTx((ELATransaction *)transaction);
 				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
 						wrapperTx.getPayload().get());
 				fireTransactionStatusChanged(payload, SubWalletCallback::Deleted, transaction->blockHeight);
@@ -151,7 +151,7 @@ namespace Elastos {
 			SharedWrapperList<Transaction, BRTransaction *> transactions =
 					_walletManager->getTransactions(
 							[](const TransactionPtr &transaction) {
-								return transaction->getTransactionType() == Transaction::RegisterIdentification;
+								return transaction->getTransactionType() == ELATransaction::RegisterIdentification;
 							});
 			std::for_each(transactions.begin(), transactions.end(),
 						  [this](const TransactionPtr &transaction) {
@@ -259,8 +259,26 @@ namespace Elastos {
 			dbPath /= SPV_DB_FILE_NAME;
 			fs::path peerConfigPath = _pathRoot;
 			peerConfigPath /= PEER_CONFIG_FILE;
+			////
+			static nlohmann::json ElaPeerConfig =
+				R"(
+						  {
+							"MagicNumber": 7630401,
+							"KnowingPeers":
+							[
+								{
+									"Address": "127.0.0.1",
+									"Port": 20866,
+									"Timestamp": 0,
+									"Services": 1,
+									"Flags": 0
+								}
+							]
+						}
+					)"_json;
+			///
 			_walletManager = WalletManagerPtr(
-					new WalletManager(dbPath, peerConfigPath, 0, 0, initialAddresses, ChainParams::mainNet()));
+					new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
 
 			_walletManager->registerWalletListener(_spvListener.get());
 		}

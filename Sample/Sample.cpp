@@ -3,11 +3,14 @@
 #include <cassert>
 #include <boost/scoped_ptr.hpp>
 #include <climits>
+#include <Interface/Enviroment.h>
 
-#include "WalletFactory.h"
 #include "IdManager.h"
 #include "leveldb/db.h"
+#include "Interface/IMasterWallet.h"
 #include "Interface/IdManagerFactory.h"
+
+#include "MasterWalletManager.h"
 
 using namespace Elastos::SDK;
 
@@ -15,6 +18,13 @@ using namespace Elastos::SDK;
 
 IMasterWallet *masterWallet = nullptr;
 std::string payPassword = "payPassword";
+
+class TestMasterWalletManager : public MasterWalletManager {
+public:
+	TestMasterWalletManager() : MasterWalletManager(MasterWalletMap()) {
+	}
+};
+
 
 class TestCallback : public IIdManagerCallback {
 public:
@@ -27,12 +37,13 @@ public:
 };
 
 void initMasterWallet() {
-	boost::scoped_ptr<WalletFactory> walletFactory(new WalletFactory);
-
+	//boost::scoped_ptr<WalletFactory> walletFactory(new WalletFactory);
+	boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
 	std::string mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
 	std::string phrasePassword = "";
 	std::string payPassword = "payPassword";
-	masterWallet = walletFactory->ImportWalletWithMnemonic(mnemonic, phrasePassword, payPassword);
+	std::string masterWalletId = "MasterWalletId";
+	masterWallet = masterWalletManager->ImportWalletWithMnemonic(masterWalletId, mnemonic, phrasePassword, payPassword);
 }
 
 std::string registerId(IIdManager *idManager) {
@@ -40,7 +51,7 @@ std::string registerId(IIdManager *idManager) {
 	std::string id;
 	{
 		std::string key;
-		masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
+		//masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
 		idManager->RegisterId(id, key, idPassword);
 	}
 	return id;
@@ -48,16 +59,17 @@ std::string registerId(IIdManager *idManager) {
 
 int main(int argc, char *argv[]) {
 
+	Enviroment::InitializeRootPath("Data");
 	initMasterWallet();
 
 	std::vector<std::string> initialAddresses;
 	IdManagerFactory idManagerFactory;
 	IIdManager *idManager = idManagerFactory.CreateIdManager(initialAddresses);
-	std::string id = registerId(idManager);
-	std::cout << "Id address: " << id << std::endl;
+	//std::string id = registerId(idManager);
+	//std::cout << "Id address: " << id << std::endl;
 
-	TestCallback callback;
-	idManager->RegisterCallback(id, &callback);
+	//TestCallback callback;
+	//idManager->RegisterCallback(id, &callback);
 
 	while (true) sleep(1);
 }
