@@ -2,8 +2,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef __ELASTOS_SDK_IDIDMANAGER_H__
-#define __ELASTOS_SDK_IDIDMANAGER_H__
+#ifndef IDCHAIN_IDIDMANAGER_H
+#define IDCHAIN_IDIDMANAGER_H
+#include <map>
+#include "nlohmann/json.hpp"
 
 #include "idid.h"
 
@@ -25,4 +27,5 @@ namespace Elastos {
 	}
 }
 
-#endif //__ELASTOS_SDK_IDMANAGERFACTORY_H__
+#endif //IDCHAIN_IDIDMANAGER_H
+

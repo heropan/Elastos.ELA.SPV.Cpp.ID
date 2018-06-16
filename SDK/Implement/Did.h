@@ -19,35 +19,37 @@ namespace Elastos {
 		public:
 			virtual ~CDid();
 
-			virtual std::string GetDIDName() = 0;
+			virtual std::string GetDIDName() ;
 
 			virtual void SetValue(
 				const std::string &keyPath,
-				const nlohmann::json &valueJson) = 0;
+				const nlohmann::json &valueJson) ;
 
 			virtual nlohmann::json GetValue(
-				const std::string &path) const = 0;
+				const std::string &path) const ;
 
 			virtual nlohmann::json GetHistoryValue(
-				const std::string &keyPath) const = 0;
+				const std::string &keyPath) const ;
 
 			virtual nlohmann::json GetAllKeys(
 				uint32_t start,
-				uint32_t count) const = 0;
+				uint32_t count) const ;
 
 			virtual std::string Sign(
-				const std::string &message) = 0;
+				const std::string &message) ;
 
 			virtual nlohmann::json CheckSign(
 				const std::string &address,
 				const std::string &message,
-				const std::string &signature) = 0;
+				const std::string &signature) ;
+
+			virtual std::string GetPublicKey() ;
 
 		protected:
-				CDid();
+				CDid() ;
 
 		protected:
-			std::string _didNameStr;
+			std::string _didNameStr ;
 		};
 	}
 }

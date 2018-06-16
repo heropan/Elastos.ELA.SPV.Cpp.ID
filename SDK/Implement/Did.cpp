@@ -20,7 +20,7 @@ namespace Elastos {
 		}
 
 		void CDid::SetValue(
-			const std::string &keyPath,
+			const std::string &keyPath ,
 			const nlohmann::json &valueJson){
 
 
@@ -37,7 +37,7 @@ namespace Elastos {
 		}
 
 		nlohmann::json CDid::GetAllKeys(
-			uint32_t start,
+			uint32_t start ,
 			uint32_t count) const {
 			return nlohmann::json();
 		}
@@ -49,13 +49,15 @@ namespace Elastos {
 		}
 
 		nlohmann::json CDid::CheckSign(
-			const std::string &address,
-			const std::string &message,
+			const std::string &address ,
+			const std::string &message ,
 			const std::string &signature){
 
 			return nlohmann::json();
 		}
 
-
+		std::string CDid::GetPublicKey() {
+			return std::string();
+		}
 	}
 }

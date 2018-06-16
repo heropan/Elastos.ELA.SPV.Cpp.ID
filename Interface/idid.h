@@ -1,10 +1,11 @@
 // Copyright (c) 2012-2018 The Elastos Open Source Project
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+#include <map>
+#include "nlohmann/json.hpp"
 
-#ifndef __ELASTOS_SDK_IDID_H__
-#define __ELASTOS_SDK_IDID_H__
-
+#ifndef IDCHAIN_IDID_H
+#define IDCHAIN_IDID_H
 
 namespace Elastos {
 	namespace SDK {
@@ -32,13 +33,18 @@ namespace Elastos {
 				const std::string &message) = 0;
 
 			virtual nlohmann::json CheckSign(
-				const std::string &address,
+				const std::string &publicKey,
 				const std::string &message,
 				const std::string &signature) = 0;
+
+			virtual std::string GetPublicKey(
+				) = 0;
 
 		};
 
 	}
 }
 
-#endif //__ELASTOS_SDK_IDMANAGERFACTORY_H__
+#endif //IDCHAIN_IDID_H
+
+
