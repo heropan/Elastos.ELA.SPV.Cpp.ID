@@ -5,14 +5,15 @@
 #ifndef __ELASTOS_SDK_IDMANAGERFACTORY_H__
 #define __ELASTOS_SDK_IDMANAGERFACTORY_H__
 
-#include "IIdManager.h"
+
+#include "ididManager.h"
 
 namespace Elastos {
 	namespace SDK {
 
 		class IdManagerFactory {
 		public:
-			IIdManager *CreateIdManager(const std::vector<std::string> &initialAddresses);
+			IDIDManager *CreateIdManager(const std::vector<std::string> &initialAddresses);
 		};
 
 	}

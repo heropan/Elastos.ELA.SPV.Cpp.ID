@@ -3,13 +3,14 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Interface/IdManagerFactory.h"
-#include "IdManager.h"
+//#include "IdManager.h"
+#include "didManager.h"
 
 namespace Elastos {
 	namespace SDK {
 
-		IIdManager* IdManagerFactory::CreateIdManager(const std::vector<std::string> &initialAddresses) {
-			return new IdManager(initialAddresses);
+		IDIDManager* IdManagerFactory::CreateIdManager(const std::vector<std::string> &initialAddresses) {
+			return new CDidManager(initialAddresses);
 		}
 
 	}

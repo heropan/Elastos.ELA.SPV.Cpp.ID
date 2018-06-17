@@ -91,6 +91,12 @@ namespace Elastos {
 
 		}
 
+		CDidManager::CDidManager(const std::vector<std::string> &initialAddresses) : _pathRoot("Data") {
+
+
+			initSpvModule(initialAddresses);
+			initIdCache();
+		}
 
 		IDID * CDidManager::CreateDID(const std::string &password){
 
@@ -99,6 +105,8 @@ namespace Elastos {
 			std::string didNameStr = "";
 			didNameStr = idID->GetDIDName(password);
 			_didMap[didNameStr] =  idID;
+
+			RegisterId(didNameStr);
 			return idID;
 		}
 
@@ -110,7 +118,7 @@ namespace Elastos {
 			return  _didMap[didName];
 		}
 
-		nlohmann::json CDidManager::GetDIDList(){
+		nlohmann::json CDidManager::GetDIDList() const {
 
 			return nlohmann::json() ;
 		}
@@ -127,11 +135,7 @@ namespace Elastos {
 			delete idID;
 		}
 
-		CDidManager::CDidManager(const std::vector<std::string> &initialAddresses) : _pathRoot("Data") {
 
-			initSpvModule(initialAddresses);
-			initIdCache();
-		}
 
 		nlohmann::json CDidManager::GetLastIdValue(const std::string &id, const std::string &path)  {
 			ParamChecker::checkNotEmpty(id);
@@ -192,6 +196,10 @@ namespace Elastos {
 				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
 
 			_walletManager->registerWalletListener(_spvListener.get());
+
+			//??????????
+			//MasterWalletStore localStore;
+			//_idAgentImpl = boost::shared_ptr<IdAgentImpl>(new IdAgentImpl(_walletManager->getWallet(), localStore.GetIdAgentInfo()));
 		}
 
 		void CDidManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,
@@ -244,11 +252,61 @@ namespace Elastos {
 			return true;
 		}
 
+
+		bool	CDidManager::RegisterCallback(const std::string &id, IIdManagerCallback *callback) {
+			if (_idListenerMap.find(id) == _idListenerMap.end()) {
+				_idListenerMap[id] = ListenerPtr(new SubWalletListener(this));
+			}
+
+			_idListenerMap[id]->AddCallback(callback);
+			return true;
+		}
+
+		bool CDidManager::UnregisterCallback(const std::string &id) {
+			if (_idListenerMap.find(id) == _idListenerMap.end())
+				return false;
+
+			_idListenerMap.erase(id);
+			return true;
+		}
+
+
+
+		void CDidManager::RegisterId(const std::string &id) {
+
+			AddressRegisteringWallet *wallet = static_cast<AddressRegisteringWallet *>(_walletManager->getWallet().get());
+			wallet->RegisterAddress(id);
+
+
+		}
+
+		void CDidManager::RecoverIds(const std::vector<std::string> &ids, const std::vector<std::string> &keys,
+								   const std::vector<std::string> &passwords) {
+			for (int i = 0; i < ids.size(); ++i) {
+				RegisterId(ids[i]);
+			}
+			_walletManager->getPeerManager()->rescan();
+		}
+
+
+		CDidManager::SubWalletListener::SubWalletListener(CDidManager *manager) : _manager(manager) {
+
+		}
 		void CDidManager::SubWalletListener::FireCallbacks(const std::string &id, const std::string &path,
 														 const nlohmann::json &value) {
 			std::for_each(_callbacks.begin(), _callbacks.end(), [&id, &path, &value](IIdManagerCallback *callback) {
 				callback->OnIdStatusChanged(id, path, value);
 			});
+		}
+
+		void CDidManager::SubWalletListener::AddCallback(IIdManagerCallback *managerCallback) {
+			if (std::find(_callbacks.begin(), _callbacks.end(), managerCallback) != _callbacks.end())
+				return;
+			_callbacks.push_back(managerCallback);
+		}
+
+		void CDidManager::SubWalletListener::RemoveCallback(IIdManagerCallback *managerCallback) {
+			_callbacks.erase(std::remove(_callbacks.begin(), _callbacks.end(), managerCallback), _callbacks.end());
 		}
 	}
 

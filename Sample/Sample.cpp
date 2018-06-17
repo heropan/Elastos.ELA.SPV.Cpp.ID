@@ -11,7 +11,9 @@
 #include "Interface/IdManagerFactory.h"
 
 #include "MasterWalletManager.h"
-
+#include "Interface/ididManager.h"
+#include "Interface/idid.h"
+#include "Implement/didManager.h"
 using namespace Elastos::SDK;
 
 #define PURPOSE 55
@@ -46,13 +48,18 @@ void initMasterWallet() {
 	masterWallet = masterWalletManager->ImportWalletWithMnemonic(masterWalletId, mnemonic, phrasePassword, payPassword);
 }
 
-std::string registerId(IIdManager *idManager) {
+std::string registerId(IDIDManager *idManager) {
 	std::string idPassword = "idPassword";
 	std::string id;
 	{
 		std::string key;
 		//masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
-		idManager->RegisterId(id, key, idPassword);
+		CDidManager* didManager = (CDidManager*)idManager;
+
+		//IDID * idID = NULL;
+		didManager->CreateDID(idPassword);
+		//id = idID->GetDIDName(idPassword);
+		//didManager->RegisterId(id);
 	}
 	return id;
 }
@@ -64,7 +71,7 @@ int main(int argc, char *argv[]) {
 
 	std::vector<std::string> initialAddresses;
 	IdManagerFactory idManagerFactory;
-	IIdManager *idManager = idManagerFactory.CreateIdManager(initialAddresses);
+	IDIDManager *idManager = idManagerFactory.CreateIdManager(initialAddresses);
 	//std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;
 

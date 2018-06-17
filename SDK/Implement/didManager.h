@@ -21,20 +21,22 @@ namespace Elastos {
 		class CDidManager : public IDIDManager
 		{
 		public:
-			virtual ~CDidManager();
 
+			CDidManager(const std::vector<std::string> &initialAddresses) ;
+
+			virtual ~CDidManager();
 
 			virtual IDID * CreateDID(const std::string &password);
 
 			virtual IDID * GetDID(const std::string &didName) ;
 
-			virtual nlohmann::json GetDIDList();
+			virtual nlohmann::json GetDIDList() const;
 
 			virtual void  DestoryDID(const std::string &didName);
 
 		protected:
 			friend class SpvListener;
-			CDidManager(const std::vector<std::string> &initialAddresses) ;
+
 
 			virtual void OnTransactionStatusChanged(
 				const std::string &id,
@@ -58,6 +60,13 @@ namespace Elastos {
 			void initSpvModule(const std::vector<std::string> &initialAddresses);
 
 			bool initIdCache();
+
+			bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
+			bool  UnregisterCallback(const std::string &id);
+			void  RecoverIds(const std::vector<std::string> &ids, const std::vector<std::string> &keys,
+									   const std::vector<std::string> &passwords);
+
+			void  RegisterId(const std::string &id);
 
 		protected:
 			class SubWalletListener {
