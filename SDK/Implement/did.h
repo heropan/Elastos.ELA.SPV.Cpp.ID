@@ -1,25 +1,29 @@
-//
-// Created by hp on 2018/6/16.
-//
+// Copyright (c) 2012-2018 The Elastos Open Source Project
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef IDCHAIN_DID_H
 #define IDCHAIN_DID_H
 
 #include <map>
 
+
 #include "nlohmann/json.hpp"
 #include "Interface/idid.h"
 
 
+
 namespace Elastos {
 	namespace SDK {
+
+		class CDidManager;
 
 		class CDid : public IDID
 		{
 		public:
 			virtual ~CDid();
 
-			virtual std::string GetDIDName() ;
+			virtual std::string GetDIDName(const std::string &password) ;
 
 			virtual void SetValue(
 				const std::string &keyPath,
@@ -46,10 +50,25 @@ namespace Elastos {
 			virtual std::string GetPublicKey() ;
 
 		protected:
-				CDid() ;
+				CDid(CDidManager* didManager) ;
 
 		protected:
+			void setValue(	const std::string &path,
+							const nlohmann::json &value,
+							uint32_t blockHeight);
+
+			void DelValue(
+							const std::string &path,
+							uint32_t blockHeight );
+
+			void CheckInit() const ;
+		protected:
+			friend class CDidManager;
+
 			std::string _didNameStr ;
+			std::string _passWord;
+			CDidManager* _didManger;
+
 		};
 	}
 }

@@ -51,7 +51,7 @@ include_directories(
 add_library(
 	idchain SHARED
 	${SDK_IMPL_SOURCE_FILES}
-        SDK/Implement/Did.h SDK/Implement/Did.cpp Interface/ididChecker.h Interface/idid.h Interface/ididManager.h)
+		SDK/Implement/did.h SDK/Implement/did.cpp Interface/ididChecker.h Interface/idid.h Interface/ididManager.h SDK/Implement/didManager.h SDK/Implement/didManager.cpp)
 
 target_link_libraries(idchain spvsdk leveldb)
 add_dependencies(idchain spvsdk leveldb)

@@ -4,6 +4,8 @@
 
 #ifndef __ELASTOS_SDK_IIDMANAGERCALLBACK_H__
 #define __ELASTOS_SDK_IIDMANAGERCALLBACK_H__
+#include <map>
+#include "nlohmann/json.hpp"
 
 namespace Elastos {
 	namespace SDK {
