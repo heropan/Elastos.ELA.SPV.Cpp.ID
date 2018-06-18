@@ -7,13 +7,14 @@
 
 
 #include "ididManager.h"
+#include "IMasterWallet.h"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IdManagerFactory {
 		public:
-			IDIDManager *CreateIdManager(const std::vector<std::string> &initialAddresses);
+			IDIDManager *CreateIdManager( SDK::IMasterWallet* masterWallet, const std::vector<std::string> &initialAddresses);
 		};
 
 	}

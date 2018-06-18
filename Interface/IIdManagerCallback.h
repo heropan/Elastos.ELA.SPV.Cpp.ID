@@ -8,7 +8,7 @@
 #include "nlohmann/json.hpp"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IIdManagerCallback {
 		public:

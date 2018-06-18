@@ -14,7 +14,7 @@
 
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class CDidManager;
 
@@ -34,7 +34,7 @@ namespace Elastos {
 
 			virtual nlohmann::json GetHistoryValue(
 				const std::string &keyPath) const ;
-
+			//path
 			virtual nlohmann::json GetAllKeys(
 				uint32_t start,
 				uint32_t count) const ;

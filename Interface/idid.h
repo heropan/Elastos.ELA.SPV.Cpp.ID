@@ -8,7 +8,7 @@
 #define IDCHAIN_IDID_H
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IDID {
 		public:

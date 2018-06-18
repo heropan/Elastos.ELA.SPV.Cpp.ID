@@ -15,7 +15,7 @@
 #include "Interface/idid.h"
 #include "Implement/didManager.h"
 using namespace Elastos::SDK;
-
+using namespace Elastos::DID;
 #define PURPOSE 55
 
 IMasterWallet *masterWallet = nullptr;
@@ -39,27 +39,33 @@ public:
 };
 
 void initMasterWallet() {
-	//boost::scoped_ptr<WalletFactory> walletFactory(new WalletFactory);
+
 	boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
 	std::string mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
 	std::string phrasePassword = "";
-	std::string payPassword = "payPassword";
+	std::string payPassword = "idPassword";
 	std::string masterWalletId = "MasterWalletId";
 	masterWallet = masterWalletManager->ImportWalletWithMnemonic(masterWalletId, mnemonic, phrasePassword, payPassword);
+
+	masterWallet = masterWalletManager->CreateMasterWallet("123456", "english");
+
+
+	masterWalletManager->InitializeMasterWallet(masterWallet->GetId(), mnemonic, phrasePassword,
+												payPassword);
+
+
 }
 
 std::string registerId(IDIDManager *idManager) {
-	std::string idPassword = "idPassword";
+	std::string idPassword = "idPassword";//must same as  initMasterWallet  payPassword
 	std::string id;
 	{
 		std::string key;
 		//masterWallet->DeriveIdAndKeyForPurpose(PURPOSE, 0, payPassword, id, key);
 		CDidManager* didManager = (CDidManager*)idManager;
 
-		//IDID * idID = NULL;
 		didManager->CreateDID(idPassword);
-		//id = idID->GetDIDName(idPassword);
-		//didManager->RegisterId(id);
+
 	}
 	return id;
 }
@@ -71,8 +77,21 @@ int main(int argc, char *argv[]) {
 
 	std::vector<std::string> initialAddresses;
 	IdManagerFactory idManagerFactory;
-	IDIDManager *idManager = idManagerFactory.CreateIdManager(initialAddresses);
-	//std::string id = registerId(idManager);
+
+	initMasterWallet();
+
+//	/////////
+//	boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
+//	//masterWallet = new Elastos::SDK::MasterWallet("123456", "english");
+//
+//	masterWallet = masterWalletManager->CreateMasterWallet("123456", "english");
+//
+//	std::string mnemonic = masterWallet->GenerateMnemonic();
+//	masterWalletManager->InitializeMasterWallet(masterWallet->GetId(), mnemonic, phrasePassword,
+//												payPassword);
+//	/////////
+	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet, initialAddresses);
+	std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;
 
 	//TestCallback callback;

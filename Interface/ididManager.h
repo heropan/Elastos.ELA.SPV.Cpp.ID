@@ -10,7 +10,7 @@
 #include "idid.h"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IDIDManager{
 		public:

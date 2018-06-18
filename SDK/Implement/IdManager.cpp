@@ -21,11 +21,14 @@
 
 namespace fs = boost::filesystem;
 
+using namespace Elastos::SDK;
+
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 
-		class SpvListener : public Wallet::Listener {
+	class SpvListener : public SDK::Wallet::Listener {
+
 		public:
 			SpvListener(IdManager *manager) : _manager(manager) {
 			}
@@ -34,9 +37,9 @@ namespace Elastos {
 
 			}
 
-			virtual void onTxAdded(const TransactionPtr &transaction) {
+			virtual void onTxAdded(const SDK::TransactionPtr &transaction) {
 
-				if (transaction->getTransactionType() != ELATransaction::RegisterIdentification)
+				if (transaction->getTransactionType() != SDK::ELATransaction::RegisterIdentification)
 					return;
 
 				fireTransactionStatusChanged(

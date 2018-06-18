@@ -13,23 +13,28 @@
 #include "SDK/SpvService/WalletManager.h"
 #include "IdCache.h"
 #include <SDK/IdAgent/IdAgentImpl.h>
+#include "MasterWallet.h"
+
+using namespace Elastos::SDK;
+class MasterWallet;
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 		class SpvListener;
+
 
 		class CDidManager : public IDIDManager
 		{
 		public:
 
-			CDidManager(const std::vector<std::string> &initialAddresses) ;
+			CDidManager(SDK::IMasterWallet* masterWallet, const std::vector<std::string> &initialAddresses) ;
 
 			virtual ~CDidManager();
 
 			virtual IDID * CreateDID(const std::string &password);
 
 			virtual IDID * GetDID(const std::string &didName) ;
-
+			//all id
 			virtual nlohmann::json GetDIDList() const;
 
 			virtual void  DestoryDID(const std::string &didName);
@@ -95,7 +100,7 @@ namespace Elastos {
 			typedef boost::shared_ptr<SubWalletListener> ListenerPtr;
 			typedef std::map<std::string, ListenerPtr> IdListenerMap;
 
-			typedef boost::shared_ptr<WalletManager> WalletManagerPtr;
+			typedef boost::shared_ptr<SDK::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 			friend class CDid;
@@ -108,8 +113,9 @@ namespace Elastos {
 
 			SpvListenerPtr _spvListener;
 			std::string _pathRoot;
-			IdCache _idCache;
-			boost::shared_ptr<IdAgentImpl> _idAgentImpl;
+			SDK::IdCache _idCache;
+
+			Elastos::SDK::MasterWallet*	_masterWallet;
 		};
 	}
 }

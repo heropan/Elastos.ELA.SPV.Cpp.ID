@@ -10,8 +10,9 @@
 
 namespace fs = boost::filesystem;
 
+using namespace Elastos::SDK;
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		CDid::CDid(CDidManager* didManager) {
 			ParamChecker::checkNullPointer(didManager);
@@ -26,10 +27,10 @@ namespace Elastos {
 
 			ParamChecker::checkPassword(password);
 
-			uint32_t index =  _didManger->_idAgentImpl->GetAllIds().size();
+			uint32_t index =  _didManger->_masterWallet->GetAllIds().size();
 
 			_passWord = password;
-			_didNameStr = _didManger->_idAgentImpl->DeriveIdAndKeyForPurpose(1 , index , password);
+			_didNameStr = _didManger->_masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
 			return _didNameStr;
 		}
 
@@ -123,7 +124,7 @@ namespace Elastos {
 
 			CheckInit();
 
-			return _didManger->_idAgentImpl->Sign(_didNameStr, message, _passWord);
+			return _didManger->_masterWallet->Sign(_didNameStr, message, _passWord);
 		}
 
 		nlohmann::json CDid::CheckSign(
@@ -148,7 +149,7 @@ namespace Elastos {
 
 		std::string CDid::GetPublicKey() {
 			CheckInit();
-			return _didManger->_idAgentImpl->GetPublicKey(_didNameStr);
+			return _didManger->_masterWallet->GetPublicKey(_didNameStr);
 		}
 
 	}

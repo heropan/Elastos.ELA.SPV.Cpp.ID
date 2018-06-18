@@ -15,7 +15,7 @@
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
 #include "SDK/ELACoreExt/ELATransaction.h"
 #include <SDK/Common/ParamChecker.h>
-
+#include "Interface/IMasterWallet.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
@@ -24,7 +24,7 @@
 namespace fs = boost::filesystem;
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class SpvListener : public Wallet::Listener {
 		public:
@@ -91,9 +91,10 @@ namespace Elastos {
 
 		}
 
-		CDidManager::CDidManager(const std::vector<std::string> &initialAddresses) : _pathRoot("Data") {
+		CDidManager::CDidManager(IMasterWallet* masterWallet , const std::vector<std::string> &initialAddresses)
+			: _pathRoot("Data") {
 
-
+			_masterWallet = (Elastos::SDK::MasterWallet*)masterWallet;
 			initSpvModule(initialAddresses);
 			initIdCache();
 		}
@@ -197,9 +198,6 @@ namespace Elastos {
 
 			_walletManager->registerWalletListener(_spvListener.get());
 
-			//??????????
-			//MasterWalletStore localStore;
-			//_idAgentImpl = boost::shared_ptr<IdAgentImpl>(new IdAgentImpl(_walletManager->getWallet(), localStore.GetIdAgentInfo()));
 		}
 
 		void CDidManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,

@@ -9,7 +9,7 @@
 #include "IIdManagerCallback.h"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IIdManager {
 		public:

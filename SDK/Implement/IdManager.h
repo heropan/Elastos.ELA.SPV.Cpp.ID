@@ -17,7 +17,7 @@
 #include "IdCache.h"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class SpvListener;
 
@@ -84,7 +84,7 @@ namespace Elastos {
 							  const std::string &path,
 							  uint32_t blockHeight);
 
-			KeyPtr deriveKey(const std::string &id,
+			SDK::KeyPtr deriveKey(const std::string &id,
 							 const std::string &password);
 
 			virtual void OnTransactionStatusChanged(
@@ -118,7 +118,7 @@ namespace Elastos {
 			typedef boost::shared_ptr<SubWalletListener> ListenerPtr;
 			typedef std::map<std::string, ListenerPtr> IdListenerMap;
 
-			typedef boost::shared_ptr<WalletManager> WalletManagerPtr;
+			typedef boost::shared_ptr<SDK::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 
@@ -131,7 +131,7 @@ namespace Elastos {
 			SpvListenerPtr _spvListener;
 
 			std::string _pathRoot;
-			IdCache _idCache;
+			SDK::IdCache _idCache;
 		};
 
 	}

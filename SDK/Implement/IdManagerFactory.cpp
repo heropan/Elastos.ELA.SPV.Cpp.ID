@@ -7,10 +7,10 @@
 #include "didManager.h"
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
-		IDIDManager* IdManagerFactory::CreateIdManager(const std::vector<std::string> &initialAddresses) {
-			return new CDidManager(initialAddresses);
+		IDIDManager* IdManagerFactory::CreateIdManager(SDK::IMasterWallet* masterWallet, const std::vector<std::string> &initialAddresses) {
+			return new CDidManager(masterWallet, initialAddresses);
 		}
 
 	}

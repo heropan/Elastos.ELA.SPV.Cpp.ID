@@ -8,7 +8,7 @@
 #define IDCHAIN_IDIDCHECKER_H
 
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		class IDIDChecker{
 		public:
