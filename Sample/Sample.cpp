@@ -75,13 +75,12 @@ int main(int argc, char *argv[]) {
 	Enviroment::InitializeRootPath("Data");
 	initMasterWallet();
 
-	std::vector<std::string> initialAddresses;
 	IdManagerFactory idManagerFactory;
 
 	initMasterWallet();
 
 
-	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet, initialAddresses);
+	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet);
 	std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;
 

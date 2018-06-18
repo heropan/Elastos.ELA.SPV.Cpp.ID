@@ -92,11 +92,11 @@ namespace Elastos {
 
 		}
 
-		CDidManager::CDidManager(IMasterWallet* masterWallet , const std::vector<std::string> &initialAddresses)
+		CDidManager::CDidManager(IMasterWallet* masterWallet)
 			: _pathRoot("Data") {
 
 			_masterWallet = (Elastos::SDK::MasterWallet*)masterWallet;
-			initSpvModule(initialAddresses);
+			initSpvModule();
 			initIdCache();
 		}
 
@@ -175,7 +175,7 @@ namespace Elastos {
 				_idListenerMap[id]->FireCallbacks(id, status, value);
 		}
 
-		void CDidManager::initSpvModule(const std::vector<std::string> &initialAddresses) {
+		void CDidManager::initSpvModule() {
 
 			fs::path dbPath = _pathRoot;
 			dbPath /= SPV_DB_FILE_NAME;
@@ -199,6 +199,8 @@ namespace Elastos {
 						}
 					)"_json;
 			///
+
+			std::vector<std::string>  initialAddresses;
 			_walletManager = WalletManagerPtr(
 				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
 

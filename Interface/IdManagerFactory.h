@@ -14,7 +14,7 @@ namespace Elastos {
 
 		class IdManagerFactory {
 		public:
-			IDIDManager *CreateIdManager( SDK::IMasterWallet* masterWallet, const std::vector<std::string> &initialAddresses);
+			IDIDManager *CreateIdManager( SDK::IMasterWallet* masterWallet);
 		};
 
 	}

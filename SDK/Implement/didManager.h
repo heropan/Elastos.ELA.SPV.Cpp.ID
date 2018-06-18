@@ -26,7 +26,7 @@ namespace Elastos {
 		{
 		public:
 
-			CDidManager(SDK::IMasterWallet* masterWallet, const std::vector<std::string> &initialAddresses) ;
+			CDidManager(SDK::IMasterWallet* masterWallet) ;
 
 			virtual ~CDidManager();
 
@@ -61,7 +61,7 @@ namespace Elastos {
 							  const std::string &path,
 							  uint32_t blockHeight);
 
-			void initSpvModule(const std::vector<std::string> &initialAddresses);
+			void initSpvModule();
 
 			bool initIdCache();
 
