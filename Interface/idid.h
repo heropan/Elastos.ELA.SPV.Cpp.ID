@@ -13,7 +13,7 @@ namespace Elastos {
 		class IDID {
 		public:
 
-			virtual std::string GetDIDName(const std::string &password) = 0;
+			virtual std::string GetDIDName() = 0;
 
 			virtual void SetValue(
 				const std::string &keyPath,

@@ -23,7 +23,7 @@ namespace Elastos {
 		public:
 			virtual ~CDid();
 
-			virtual std::string GetDIDName(const std::string &password) ;
+			virtual std::string GetDIDName() ;
 
 			virtual void SetValue(
 				const std::string &keyPath,
@@ -50,7 +50,7 @@ namespace Elastos {
 			virtual std::string GetPublicKey() ;
 
 		protected:
-				CDid(CDidManager* didManager) ;
+				CDid(CDidManager* didManager, const std::string &id) ;
 
 		protected:
 			void setValue(	const std::string &path,

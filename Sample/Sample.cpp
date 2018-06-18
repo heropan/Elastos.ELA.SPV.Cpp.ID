@@ -80,16 +80,7 @@ int main(int argc, char *argv[]) {
 
 	initMasterWallet();
 
-//	/////////
-//	boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
-//	//masterWallet = new Elastos::SDK::MasterWallet("123456", "english");
-//
-//	masterWallet = masterWalletManager->CreateMasterWallet("123456", "english");
-//
-//	std::string mnemonic = masterWallet->GenerateMnemonic();
-//	masterWalletManager->InitializeMasterWallet(masterWallet->GetId(), mnemonic, phrasePassword,
-//												payPassword);
-//	/////////
+
 	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet, initialAddresses);
 	std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;

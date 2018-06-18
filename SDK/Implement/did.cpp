@@ -14,23 +14,18 @@ using namespace Elastos::SDK;
 namespace Elastos {
 	namespace DID {
 
-		CDid::CDid(CDidManager* didManager) {
+		CDid::CDid(CDidManager* didManager, const std::string &id) {
 			ParamChecker::checkNullPointer(didManager);
 			_didManger = didManager;
+			_didNameStr = id;
 		}
 
 		CDid::~CDid(){
 
 		}
 
-		std::string CDid::GetDIDName(const std::string &password){
+		std::string CDid::GetDIDName(){
 
-			ParamChecker::checkPassword(password);
-
-			uint32_t index =  _didManger->_masterWallet->GetAllIds().size();
-
-			_passWord = password;
-			_didNameStr = _didManger->_masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
 			return _didNameStr;
 		}
 

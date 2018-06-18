@@ -102,10 +102,15 @@ namespace Elastos {
 
 		IDID * CDidManager::CreateDID(const std::string &password){
 
-			CDid * idID = new  CDid(this);
+
+			ParamChecker::checkPassword(password);
+
+			uint32_t index =  _masterWallet->GetAllIds().size();
 
 			std::string didNameStr = "";
-			didNameStr = idID->GetDIDName(password);
+			didNameStr = _masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
+			CDid * idID = new  CDid(this, didNameStr);
+
 			_didMap[didNameStr] =  idID;
 
 			RegisterId(didNameStr);
