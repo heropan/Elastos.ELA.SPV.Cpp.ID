@@ -15,8 +15,7 @@
 #include <SDK/IdAgent/IdAgentImpl.h>
 #include "MasterWallet.h"
 
-using namespace Elastos::SDK;
-class MasterWallet;
+
 
 namespace Elastos {
 	namespace DID {

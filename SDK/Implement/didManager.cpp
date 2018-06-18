@@ -22,6 +22,7 @@
 #define IDCACHE_DIR_NAME "IdCache"
 
 namespace fs = boost::filesystem;
+using namespace Elastos::SDK;
 
 namespace Elastos {
 	namespace DID {

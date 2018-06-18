@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Interface/IdManagerFactory.h"
-//#include "IdManager.h"
 #include "didManager.h"
 
 namespace Elastos {
