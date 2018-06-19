@@ -42,7 +42,7 @@ namespace Elastos {
 			ParamChecker::checkNotEmpty(path);
 
 
-			_didManger->_idCache.Delete(_didNameStr, path, blockHeight);
+			_didManger->_idCache->Delete(_didNameStr, path, blockHeight);
 		}
 
 		void CDid::setValue(
@@ -53,7 +53,7 @@ namespace Elastos {
 			CheckInit();
 			ParamChecker::checkNotEmpty(path);
 
-			_didManger->_idCache.Put(_didNameStr,  path, blockHeight , value);
+			_didManger->_idCache->Put(_didNameStr,  path, blockHeight , value);
 		}
 
 		void CDid::SetValue(
@@ -64,7 +64,7 @@ namespace Elastos {
 			ParamChecker::checkNotEmpty(keyPath);
 			//检查是否json ???
 
-			_didManger->_idCache.Put(_didNameStr,  keyPath, valueJson);
+			_didManger->_idCache->Put(_didNameStr,  keyPath, valueJson);
 
 		}
 
@@ -75,7 +75,7 @@ namespace Elastos {
 			ParamChecker::checkNotEmpty(path);
 
 			nlohmann::json jsonGet;
-			jsonGet =_didManger-> _idCache.Get(_didNameStr, path);
+			jsonGet =_didManger-> _idCache->Get(_didNameStr, path);
 			if (jsonGet.empty()) {
 				return nlohmann::json();
 			}
@@ -101,7 +101,7 @@ namespace Elastos {
 			ParamChecker::checkNotEmpty(keyPath);
 
 
-			return _didManger->_idCache.Get(_didNameStr, keyPath);
+			return _didManger->_idCache->Get(_didNameStr, keyPath);
 		}
 
 		nlohmann::json CDid::GetAllKeys(

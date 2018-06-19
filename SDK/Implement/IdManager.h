@@ -122,6 +122,8 @@ namespace Elastos {
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 
+			typedef boost::shared_ptr<SDK::IdCache> IdCachePtr;
+
 			IdKeyMap _idKeyMap;
 
 			IdListenerMap _idListenerMap;
@@ -131,7 +133,7 @@ namespace Elastos {
 			SpvListenerPtr _spvListener;
 
 			std::string _pathRoot;
-			SDK::IdCache _idCache;
+			IdCachePtr _idCache;
 		};
 
 	}

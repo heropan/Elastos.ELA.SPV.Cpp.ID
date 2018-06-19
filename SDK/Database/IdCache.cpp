@@ -32,6 +32,7 @@ namespace Elastos {
 		}
 
 		IdCache::IdCache() {
+			_db = nullptr;
 		}
 
 		IdCache::~IdCache() {
@@ -268,7 +269,7 @@ namespace Elastos {
 
 		bool IdCache::Initialized() const {
 			if (_db == nullptr) {
-				Log::getLogger()->error("IDCache invalid; _db is nullptr");
+				Log::getLogger()->error("IdCache not Initialized ");
 				return false;
 			}
 

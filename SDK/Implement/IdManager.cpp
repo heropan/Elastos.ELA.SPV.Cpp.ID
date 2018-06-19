@@ -120,7 +120,7 @@ namespace Elastos {
 
 		nlohmann::json IdManager::GetLastIdValue(const std::string &id, const std::string &path) const {
 			nlohmann::json jsonGet;
-			jsonGet = _idCache.Get(id, path);
+			jsonGet = _idCache->Get(id, path);
 			if (jsonGet.empty()) {
 				return nlohmann::json();
 			}
@@ -139,17 +139,17 @@ namespace Elastos {
 		}
 
 		nlohmann::json IdManager::GetIdHistoryValues(const std::string &id, const std::string &path) const {
-			return _idCache.Get(id, path);;
+			return _idCache->Get(id, path);;
 		}
 
 		bool IdManager::initIdCache() {
-			if (_idCache.Initialized())
+			if (_idCache->Initialized())
 				return true;
 
 			fs::path idCachePath = _pathRoot;
 			idCachePath /= IDCACHE_DIR_NAME;
 
-			_idCache = IdCache(idCachePath);
+			_idCache =IdCachePtr(new IdCache(idCachePath));
 
 			SharedWrapperList<Transaction, BRTransaction *> transactions =
 					_walletManager->getTransactions(
@@ -165,7 +165,7 @@ namespace Elastos {
 							  nlohmann::json jsonToSave = payload->toJson();
 							  jsonToSave.erase(payload->getId());
 							  jsonToSave.erase(payload->getPath());
-							  _idCache.Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+							  _idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
 						  });
 			return true;
 		}
@@ -175,11 +175,11 @@ namespace Elastos {
 			//todo consider block height equal INT_MAX(unconfirmed)
 			//todo parse proof, data hash, sign from value
 
-			_idCache.Put(id, path, blockHeight, value);
+			_idCache->Put(id, path, blockHeight, value);
 		}
 
 		void IdManager::removeIdItem(const std::string &id, const std::string &path, uint32_t blockHeight) {
-			_idCache.Delete(id, path, blockHeight);
+			_idCache->Delete(id, path, blockHeight);
 		}
 
 		std::string IdManager::Sign(const std::string &id, const std::string &message, const std::string &password) {

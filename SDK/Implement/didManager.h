@@ -72,6 +72,8 @@ namespace Elastos {
 
 			void  RegisterId(const std::string &id);
 
+			IDID *  NewDid(const std::string didNameStr);
+
 		protected:
 			class SubWalletListener {
 			public:
@@ -102,6 +104,8 @@ namespace Elastos {
 			typedef boost::shared_ptr<SDK::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
+
+			typedef boost::shared_ptr<SDK::IdCache> IdCachePtr;
 			friend class CDid;
 			DidMap	_didMap;
 
@@ -112,7 +116,7 @@ namespace Elastos {
 
 			SpvListenerPtr _spvListener;
 			std::string _pathRoot;
-			SDK::IdCache _idCache;
+			IdCachePtr _idCache;
 
 			Elastos::SDK::MasterWallet*	_masterWallet;
 		};

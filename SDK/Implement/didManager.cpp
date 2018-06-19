@@ -90,10 +90,22 @@ namespace Elastos {
 
 		CDidManager::~CDidManager() {
 
+			DidMap::iterator itor ;
+			CDid* did = NULL;
+
+			for (itor = _didMap.begin(); itor !=  _didMap.end(); ) {
+
+				did = (CDid*)itor->second;
+				delete did;
+				_didMap.erase(itor++);
+
+			}
+
 		}
 
 		CDidManager::CDidManager(IMasterWallet* masterWallet)
 			: _pathRoot("Data") {
+			ParamChecker::checkNullPointer(masterWallet);
 
 			_masterWallet = (Elastos::SDK::MasterWallet*)masterWallet;
 			initSpvModule();
@@ -109,12 +121,10 @@ namespace Elastos {
 
 			std::string didNameStr = "";
 			didNameStr = _masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
-			CDid * idID = new  CDid(this, didNameStr);
 
-			_didMap[didNameStr] =  idID;
 
-			RegisterId(didNameStr);
-			return idID;
+
+			return NewDid(didNameStr);
 		}
 
 		IDID * CDidManager::GetDID(const std::string &didName)  {
@@ -231,13 +241,13 @@ namespace Elastos {
 		}
 
 		bool CDidManager::initIdCache() {
-			if (_idCache.Initialized())
+			if (_idCache != NULL)
 				return true;
 
 			fs::path idCachePath = _pathRoot;
 			idCachePath /= IDCACHE_DIR_NAME;
 
-			_idCache = IdCache(idCachePath);
+			_idCache =IdCachePtr(new IdCache(idCachePath));
 
 			SharedWrapperList<Transaction, BRTransaction *> transactions =
 				_walletManager->getTransactions(
@@ -253,7 +263,9 @@ namespace Elastos {
 							  nlohmann::json jsonToSave = payload->toJson();
 							  jsonToSave.erase(payload->getId());
 							  jsonToSave.erase(payload->getPath());
-							  _idCache.Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+
+							  NewDid(payload->getId());
+							  _idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
 						  });
 			return true;
 		}
@@ -276,7 +288,13 @@ namespace Elastos {
 			return true;
 		}
 
+		IDID *  CDidManager::NewDid(const std::string didNameStr) {
 
+			CDid * idID = new  CDid(this, didNameStr);
+			_didMap[didNameStr] =  idID;
+			RegisterId(didNameStr);
+			return idID;
+		}
 
 		void CDidManager::RegisterId(const std::string &id) {
 
