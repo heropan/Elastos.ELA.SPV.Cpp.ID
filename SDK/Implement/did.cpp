@@ -16,6 +16,8 @@ namespace Elastos {
 
 		CDid::CDid(CDidManager* didManager, const std::string &id) {
 			ParamChecker::checkNullPointer(didManager);
+			ParamChecker::checkNotEmpty(id);
+
 			_didManger = didManager;
 			_didNameStr = id;
 		}
@@ -31,7 +33,7 @@ namespace Elastos {
 
 		void CDid::CheckInit() const {
 			ParamChecker::checkNotEmpty(_didNameStr);
-			ParamChecker::checkNotEmpty(_passWord);
+			//ParamChecker::checkNotEmpty(_passWord);
 		}
 
 		void CDid::DelValue(
@@ -110,20 +112,30 @@ namespace Elastos {
 
 			CheckInit();
 
-			return nlohmann::json();
+			nlohmann::json keysJson;
+
+			nlohmann::json jsonGet;
+			jsonGet =_didManger-> _idCache->Get(_didNameStr);
+
+			for (nlohmann::json::const_iterator it = jsonGet.begin(); it != jsonGet.end(); it++) {
+				keysJson.push_back(it.key());
+			}
+
+
+			return keysJson;
 		}
 
 		//key password ？
 		std::string CDid::Sign(
-			const std::string &message){
+			const std::string &message , const std::string &password){
 
+			ParamChecker::checkNotEmpty(password);
 			CheckInit();
 
-			return _didManger->_masterWallet->Sign(_didNameStr, message, _passWord);
+			return _didManger->_masterWallet->Sign(_didNameStr, message, password);
 		}
 
 		nlohmann::json CDid::CheckSign(
-			const std::string &address ,
 			const std::string &message ,
 			const std::string &signature){
 
@@ -136,7 +148,8 @@ namespace Elastos {
 			UInt256 md;
 			BRSHA256(&md, message.c_str(), message.size());
 
-			bool r = Key::verifyByPublicKey(address, md, signatureData);
+
+			bool r = Key::verifyByPublicKey(_didNameStr, md, signatureData);
 			nlohmann::json jsonData;
 			jsonData["Result"] = r;
 			return jsonData;

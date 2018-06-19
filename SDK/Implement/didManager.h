@@ -38,6 +38,7 @@ namespace Elastos {
 
 			virtual void  DestoryDID(const std::string &didName);
 
+
 		protected:
 			friend class SpvListener;
 
@@ -72,7 +73,7 @@ namespace Elastos {
 
 			void  RegisterId(const std::string &id);
 
-			IDID *  NewDid(const std::string didNameStr);
+			IDID*  NewDid(const std::string didNameStr);
 
 		protected:
 			class SubWalletListener {

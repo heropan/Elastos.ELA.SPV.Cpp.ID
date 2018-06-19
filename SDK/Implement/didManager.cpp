@@ -137,7 +137,14 @@ namespace Elastos {
 
 		nlohmann::json CDidManager::GetDIDList() const {
 
-			return nlohmann::json() ;
+			nlohmann::json didJson;
+
+			DidMap::const_iterator itor  = _didMap.begin() ;
+			for (itor  =  _didMap.begin() ; itor != _didMap.end(); itor++) {
+
+				didJson.push_back(itor->first);
+			}
+			return didJson ;
 		}
 
 		void  CDidManager::DestoryDID(const std::string &didName){
@@ -150,6 +157,8 @@ namespace Elastos {
 			CDid * idID = (CDid *)itor->second;
 			_didMap.erase(itor);
 			delete idID;
+
+			_idCache->Delete(didName);
 		}
 
 

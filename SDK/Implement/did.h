@@ -40,10 +40,9 @@ namespace Elastos {
 				uint32_t count) const ;
 
 			virtual std::string Sign(
-				const std::string &message) ;
+				const std::string &message, const std::string &password) ;
 
 			virtual nlohmann::json CheckSign(
-				const std::string &address,
 				const std::string &message,
 				const std::string &signature) ;
 
