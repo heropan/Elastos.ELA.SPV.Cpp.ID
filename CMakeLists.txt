@@ -17,6 +17,35 @@ macro(option_with_default OPTION_NAME OPTION_STRING OPTION_DEFAULT)
 	option(${OPTION_NAME} "${OPTION_STRING}" ${${OPTION_NAME}})
 endmacro(option_with_default OPTION_NAME OPTION_STRING OPTION_DEFAULT)
 
+option_with_default(IDCHAIN_FOR_ANDROID "Build spv for android" OFF)
+
+if(IDCHAIN_FOR_ANDROID)
+	set(SPV_FOR_ANDROID ON)
+	message(STATUS "Build idchain for android")
+
+	set(CMAKE_SYSTEM_NAME Android)
+	set(CMAKE_ANDROID_STL_TYPE c++_static)
+	#set(CMAKE_ANDROID_STL_TYPE c++_shared)
+
+	if(NOT DEFINED ANDROID_NATIVE_API_LEVEL)
+		set(CMAKE_SYSTEM_VERSION 23)
+	else()
+		set(CMAKE_SYSTEM_VERSION ${ANDROID_NATIVE_API_LEVEL})
+	endif()
+
+	if("$ENV{ANDROID_NDK}" STREQUAL "")
+		message(FATAL_ERROR "Environment variable ANDROID_NDK not define")
+	endif()
+	set(CMAKE_ANDROID_NDK $ENV{ANDROID_NDK})
+	set(CMAKE_ANDROID_NDK_TOOLCHAIN_VERSION clang)
+
+	# can be value below: arm64-v8a armeabi-v7a armeabi-v6 armeabi x86 x86_64
+	if(NOT DEFINED CMAKE_ANDROID_ARCH_ABI)
+		set(CMAKE_ANDROID_ARCH_ABI armeabi-v7a CACHE STRING "Android ABI (architecture)" FORCE)
+	endif()
+	set_property(CACHE CMAKE_ANDROID_ARCH_ABI PROPERTY STRINGS arm64-v8a armeabi-v7a armeabi-v6 armeabi x86 x86_64)
+endif()
+
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type." FORCE)
 endif()
@@ -56,7 +85,7 @@ add_library(
 target_link_libraries(idchain spvsdk leveldb)
 add_dependencies(idchain spvsdk leveldb)
 
-if (IDCHAIN_BUILD_SAMPLE)
+if(IDCHAIN_BUILD_SAMPLE)
 	add_subdirectory(Sample)
 endif()
 

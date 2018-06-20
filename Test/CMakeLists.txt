@@ -27,10 +27,11 @@ foreach(src ${IDTEST_SOURCE_FILES})
 	endif()
 endforeach()
 
-add_custom_command(
-	TARGET idchain_auto_test
-	POST_BUILD
-	COMMAND ${AUTO_TEST_COMMAND}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-
+if(NOT IDCHAIN_FOR_ANDROID)
+	add_custom_command(
+		TARGET idchain_auto_test
+		POST_BUILD
+		COMMAND ${AUTO_TEST_COMMAND}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	)
+endif()
