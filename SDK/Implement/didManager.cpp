@@ -22,7 +22,7 @@
 #define IDCACHE_DIR_NAME "IdCache"
 
 namespace fs = boost::filesystem;
-using namespace Elastos::SDK;
+using namespace Elastos::ElaWallet;
 
 namespace Elastos {
 	namespace DID {
@@ -107,7 +107,7 @@ namespace Elastos {
 			: _pathRoot("Data") {
 			ParamChecker::checkNullPointer(masterWallet);
 
-			_masterWallet = (Elastos::SDK::MasterWallet*)masterWallet;
+			_masterWallet = (Elastos::ElaWallet::MasterWallet*)masterWallet;
 			initSpvModule();
 			initIdCache();
 		}

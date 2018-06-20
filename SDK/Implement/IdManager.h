@@ -84,7 +84,7 @@ namespace Elastos {
 							  const std::string &path,
 							  uint32_t blockHeight);
 
-			SDK::KeyPtr deriveKey(const std::string &id,
+			ElaWallet::KeyPtr deriveKey(const std::string &id,
 							 const std::string &password);
 
 			virtual void OnTransactionStatusChanged(
@@ -118,11 +118,11 @@ namespace Elastos {
 			typedef boost::shared_ptr<SubWalletListener> ListenerPtr;
 			typedef std::map<std::string, ListenerPtr> IdListenerMap;
 
-			typedef boost::shared_ptr<SDK::WalletManager> WalletManagerPtr;
+			typedef boost::shared_ptr<ElaWallet::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 
-			typedef boost::shared_ptr<SDK::IdCache> IdCachePtr;
+			typedef boost::shared_ptr<IdCache> IdCachePtr;
 
 			IdKeyMap _idKeyMap;
 

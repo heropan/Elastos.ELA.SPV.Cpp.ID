@@ -26,7 +26,7 @@ namespace Elastos {
 		{
 		public:
 
-			CDidManager(SDK::IMasterWallet* masterWallet) ;
+			CDidManager(ElaWallet::IMasterWallet* masterWallet) ;
 
 			virtual ~CDidManager();
 
@@ -102,11 +102,11 @@ namespace Elastos {
 			typedef boost::shared_ptr<SubWalletListener> ListenerPtr;
 			typedef std::map<std::string, ListenerPtr> IdListenerMap;
 
-			typedef boost::shared_ptr<SDK::WalletManager> WalletManagerPtr;
+			typedef boost::shared_ptr<ElaWallet::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 
-			typedef boost::shared_ptr<SDK::IdCache> IdCachePtr;
+			typedef boost::shared_ptr<IdCache> IdCachePtr;
 			friend class CDid;
 			DidMap	_didMap;
 
@@ -119,7 +119,7 @@ namespace Elastos {
 			std::string _pathRoot;
 			IdCachePtr _idCache;
 
-			Elastos::SDK::MasterWallet*	_masterWallet;
+			Elastos::ElaWallet::MasterWallet*	_masterWallet;
 		};
 	}
 }

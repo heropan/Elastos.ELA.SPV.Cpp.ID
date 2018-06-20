@@ -14,7 +14,7 @@
 #include "Interface/ididManager.h"
 #include "Interface/idid.h"
 #include "Implement/didManager.h"
-using namespace Elastos::SDK;
+using namespace Elastos::ElaWallet;
 using namespace Elastos::DID;
 #define PURPOSE 55
 

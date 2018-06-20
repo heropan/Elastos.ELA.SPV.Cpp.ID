@@ -11,7 +11,7 @@
 #include "IdCache.h"
 #include "catch.hpp"
 
-using namespace Elastos::SDK;
+using namespace Elastos::DID;
 
 const std::string IdCachePath = "IdCacheTestDB";
 

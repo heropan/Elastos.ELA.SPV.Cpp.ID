@@ -8,8 +8,10 @@
 #include "SDK/Common/Log.h"
 #include "IdCache.h"
 
+using namespace Elastos::ElaWallet;
+
 namespace Elastos {
-	namespace SDK {
+	namespace DID {
 
 		IdCache::IdCache(const boost::filesystem::path &path) {
 

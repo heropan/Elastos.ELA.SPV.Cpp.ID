@@ -10,7 +10,7 @@
 
 namespace fs = boost::filesystem;
 
-using namespace Elastos::SDK;
+using namespace Elastos::ElaWallet;
 namespace Elastos {
 	namespace DID {
 

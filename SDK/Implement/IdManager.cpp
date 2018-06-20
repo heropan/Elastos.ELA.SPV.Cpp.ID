@@ -21,13 +21,13 @@
 
 namespace fs = boost::filesystem;
 
-using namespace Elastos::SDK;
+using namespace Elastos::ElaWallet;
 
 namespace Elastos {
 	namespace DID {
 
 
-	class SpvListener : public SDK::Wallet::Listener {
+	class SpvListener : public ElaWallet::Wallet::Listener {
 
 		public:
 			SpvListener(IdManager *manager) : _manager(manager) {
@@ -37,9 +37,9 @@ namespace Elastos {
 
 			}
 
-			virtual void onTxAdded(const SDK::TransactionPtr &transaction) {
+			virtual void onTxAdded(const ElaWallet::TransactionPtr &transaction) {
 
-				if (transaction->getTransactionType() != SDK::ELATransaction::RegisterIdentification)
+				if (transaction->getTransactionType() != ElaWallet::ELATransaction::RegisterIdentification)
 					return;
 
 				fireTransactionStatusChanged(
@@ -192,12 +192,11 @@ namespace Elastos {
 			UInt256 md;
 			BRSHA256(&md, message.c_str(), message.size());
 
-			CMBlock signedData = key->sign(md);
+			CMBlock mdData;
+			mdData.SetMemFixed(md.u8, sizeof(md.u8));
+			CMBlock signedData = key->compactSign(mdData);
 
-			char *data = new char[signedData.GetSize()];
-			memcpy(data, signedData, signedData.GetSize());
-			std::string singedMsg(data, signedData.GetSize());
-			return singedMsg;
+			return Utils::encodeHex(signedData);
 		}
 
 		nlohmann::json
