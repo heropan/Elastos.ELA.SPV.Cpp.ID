@@ -20,6 +20,8 @@
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
 #define IDCACHE_DIR_NAME "IdCache"
+#define IDCHAIN_NAME     "IdChain"
+
 
 namespace fs = boost::filesystem;
 using namespace Elastos::ElaWallet;
@@ -47,29 +49,29 @@ namespace Elastos {
 			}
 
 			virtual void onTxUpdated(const std::string &hash, uint32_t blockHeight, uint32_t timeStamp) {
-				BRTransaction *transaction = BRWalletTransactionForHash(
-					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
-				if (transaction == nullptr ||
-					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
-					return;
-
-				Transaction wrapperTx((ELATransaction *)transaction);
-				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
-					wrapperTx.getPayload().get());
-				fireTransactionStatusChanged(payload, SubWalletCallback::Updated, blockHeight);
+//				BRTransaction *transaction = BRWalletTransactionForHash(
+//					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
+//				if (transaction == nullptr ||
+//					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
+//					return;
+//
+//				Transaction wrapperTx((ELATransaction *)transaction);
+//				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
+//					wrapperTx.getPayload().get());
+//				fireTransactionStatusChanged(payload, SubWalletCallback::Updated, blockHeight);
 			}
 
 			virtual void onTxDeleted(const std::string &hash, bool notifyUser, bool recommendRescan) {
-				BRTransaction *transaction = BRWalletTransactionForHash(
-					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
-				if (transaction == nullptr ||
-					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
-					return;
-
-				Transaction wrapperTx((ELATransaction *)transaction);
-				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
-					wrapperTx.getPayload().get());
-				fireTransactionStatusChanged(payload, SubWalletCallback::Deleted, transaction->blockHeight);
+//				BRTransaction *transaction = BRWalletTransactionForHash(
+//					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
+//				if (transaction == nullptr ||
+//					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
+//					return;
+//
+//				Transaction wrapperTx((ELATransaction *)transaction);
+//				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
+//					wrapperTx.getPayload().get());
+//				fireTransactionStatusChanged(payload, SubWalletCallback::Deleted, transaction->blockHeight);
 			}
 
 
@@ -108,6 +110,7 @@ namespace Elastos {
 			ParamChecker::checkNullPointer(masterWallet);
 
 			_masterWallet = (Elastos::ElaWallet::MasterWallet*)masterWallet;
+			_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
 			initSpvModule();
 			initIdCache();
 		}
@@ -218,12 +221,12 @@ namespace Elastos {
 						}
 					)"_json;
 			///
-
-			std::vector<std::string>  initialAddresses;
-			_walletManager = WalletManagerPtr(
-				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
-
-			_walletManager->registerWalletListener(_spvListener.get());
+			//WalletManager future use
+//			std::vector<std::string>  initialAddresses;
+//			_walletManager = WalletManagerPtr(
+//				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
+//
+//			_walletManager->registerWalletListener(_spvListener.get());
 
 		}
 
@@ -249,6 +252,22 @@ namespace Elastos {
 
 		}
 
+		ISubWallet * CDidManager::GetIDSubWallet(){
+
+			std::vector<ISubWallet *> subWalletVec;
+			subWalletVec = _masterWallet->GetAllSubWallets();
+			ISubWallet * subWallet = NULL;
+
+			for (int i = 0; i < subWalletVec.size(); ++i) {
+				subWallet = subWalletVec[i];
+				if (subWallet->GetChainId() ==  IDCHAIN_NAME){
+					break;
+				}
+				subWallet = NULL;
+			}
+			return subWallet;
+		}
+
 		bool CDidManager::initIdCache() {
 			if (_idCache != NULL)
 				return true;
@@ -258,24 +277,33 @@ namespace Elastos {
 
 			_idCache =IdCachePtr(new IdCache(idCachePath));
 
-			SharedWrapperList<Transaction, BRTransaction *> transactions =
-				_walletManager->getTransactions(
-					[](const TransactionPtr &transaction) {
-						return transaction->getTransactionType() == ELATransaction::RegisterIdentification;
-					});
-			std::for_each(transactions.begin(), transactions.end(),
-						  [this](const TransactionPtr &transaction) {
-							  PayloadRegisterIdentification *payload =
-								  static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get());
-							  uint32_t blockHeight = transaction->getBlockHeight();
 
-							  nlohmann::json jsonToSave = payload->toJson();
-							  jsonToSave.erase(payload->getId());
-							  jsonToSave.erase(payload->getPath());
+			ISubWallet * subWallet = GetIDSubWallet();
+			if (subWallet){
+				nlohmann::json transJson;
+				nlohmann::json allTransJsonRet = subWallet->GetAllTransaction(0
+					, 10000 , "");
+				transJson = allTransJsonRet["Transactions"];
 
-							  NewDid(payload->getId());
-							  _idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
-						  });
+				Transaction transaction;
+				for (nlohmann::json::const_iterator it = transJson.begin(); it != transJson.end(); it++) {
+					//transAction = it.value();
+					transaction.fromJson(it.value());
+
+
+					PayloadRegisterIdentification *payload =
+						static_cast<PayloadRegisterIdentification *>(transaction.getPayload().get());
+					uint32_t blockHeight = transaction.getBlockHeight();
+
+					nlohmann::json jsonToSave = payload->toJson();
+					jsonToSave.erase(payload->getId());
+					jsonToSave.erase(payload->getPath());
+					//if id  is mine
+					NewDid(payload->getId());
+					_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+				}
+			}
+
 			return true;
 		}
 
@@ -307,18 +335,20 @@ namespace Elastos {
 
 		void CDidManager::RegisterId(const std::string &id) {
 
-			AddressRegisteringWallet *wallet = static_cast<AddressRegisteringWallet *>(_walletManager->getWallet().get());
-			wallet->RegisterAddress(id);
+			//WalletManager future use
+			//AddressRegisteringWallet *wallet = static_cast<AddressRegisteringWallet *>(_walletManager->getWallet().get());
+			//wallet->RegisterAddress(id);
 
 
 		}
 
 		void CDidManager::RecoverIds(const std::vector<std::string> &ids, const std::vector<std::string> &keys,
 								   const std::vector<std::string> &passwords) {
-			for (int i = 0; i < ids.size(); ++i) {
-				RegisterId(ids[i]);
-			}
-			_walletManager->getPeerManager()->rescan();
+			//WalletManager future use
+//			for (int i = 0; i < ids.size(); ++i) {
+//				RegisterId(ids[i]);
+//			}
+//			_walletManager->getPeerManager()->rescan();
 		}
 
 

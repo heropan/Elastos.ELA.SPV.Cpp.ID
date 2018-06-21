@@ -279,10 +279,10 @@ namespace Elastos {
 						}
 					)"_json;
 			///
-			_walletManager = WalletManagerPtr(
-					new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
+//			_walletManager = WalletManagerPtr(
+//					new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
 
-			_walletManager->registerWalletListener(_spvListener.get());
+//			_walletManager->registerWalletListener(_spvListener.get());
 		}
 
 		void

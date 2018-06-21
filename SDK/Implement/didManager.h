@@ -14,8 +14,8 @@
 #include "IdCache.h"
 #include <SDK/IdAgent/IdAgentImpl.h>
 #include "MasterWallet.h"
-
-
+#include "Interface/IIdAgent.h"
+#include "Interface/ISubWallet.h"
 
 namespace Elastos {
 	namespace DID {
@@ -75,6 +75,8 @@ namespace Elastos {
 
 			IDID*  NewDid(const std::string didNameStr);
 
+			ElaWallet::ISubWallet * GetIDSubWallet();
+
 		protected:
 			class SubWalletListener {
 			public:
@@ -113,13 +115,16 @@ namespace Elastos {
 
 			IdListenerMap _idListenerMap;
 
-			WalletManagerPtr _walletManager;
+
+			//WalletManagerPtr _walletManager;
 
 			SpvListenerPtr _spvListener;
 			std::string _pathRoot;
 			IdCachePtr _idCache;
 
+
 			Elastos::ElaWallet::MasterWallet*	_masterWallet;
+			Elastos::ElaWallet::IIdAgent*	    _iidAgent;
 		};
 	}
 }
