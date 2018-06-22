@@ -106,6 +106,7 @@ namespace Elastos {
 			return _didManger->_idCache->Get(_didNameStr, keyPath);
 		}
 
+		//start下标第一个为0
 		nlohmann::json CDid::GetAllKeys(
 			uint32_t start ,
 			uint32_t count) const {
@@ -114,11 +115,29 @@ namespace Elastos {
 
 			nlohmann::json keysJson;
 
+			if(count == 0){
+
+				throw std::invalid_argument("count mut big than 0");
+			}
+
+			uint32_t addCount = 0;
 			nlohmann::json jsonGet;
 			jsonGet =_didManger-> _idCache->Get(_didNameStr);
 
-			for (nlohmann::json::const_iterator it = jsonGet.begin(); it != jsonGet.end(); it++) {
+			if(start >= jsonGet.size()){
+
+				throw std::invalid_argument("start >= jsonGet.size()");
+			}
+
+			nlohmann::json::const_iterator it = jsonGet.begin();
+			std::advance (it,start);
+			for (; it != jsonGet.end(); it++) {
 				keysJson.push_back(it.key());
+				addCount++;
+
+				if(addCount >= count){
+					break;
+				}
 			}
 
 

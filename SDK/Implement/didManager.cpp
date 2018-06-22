@@ -16,6 +16,7 @@
 #include "SDK/ELACoreExt/ELATransaction.h"
 #include <SDK/Common/ParamChecker.h>
 #include "Interface/IMasterWallet.h"
+#include "Interface/Enviroment.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
@@ -200,27 +201,27 @@ namespace Elastos {
 
 		void CDidManager::initSpvModule() {
 
-			fs::path dbPath = _pathRoot;
-			dbPath /= SPV_DB_FILE_NAME;
-			fs::path peerConfigPath = _pathRoot;
-			peerConfigPath /= PEER_CONFIG_FILE;
-			////
-			static nlohmann::json ElaPeerConfig =
-				R"(
-						  {
-							"MagicNumber": 7630401,
-							"KnowingPeers":
-							[
-								{
-									"Address": "127.0.0.1",
-									"Port": 20866,
-									"Timestamp": 0,
-									"Services": 1,
-									"Flags": 0
-								}
-							]
-						}
-					)"_json;
+//			fs::path dbPath = _pathRoot;
+//			dbPath /= SPV_DB_FILE_NAME;
+//			fs::path peerConfigPath = _pathRoot;
+//			peerConfigPath /= PEER_CONFIG_FILE;
+//			////
+//			static nlohmann::json ElaPeerConfig =
+//				R"(
+//						  {
+//							"MagicNumber": 7630401,
+//							"KnowingPeers":
+//							[
+//								{
+//									"Address": "127.0.0.1",
+//									"Port": 20866,
+//									"Timestamp": 0,
+//									"Services": 1,
+//									"Flags": 0
+//								}
+//							]
+//						}
+//					)"_json;
 			///
 			//WalletManager future use
 //			std::vector<std::string>  initialAddresses;
@@ -273,7 +274,7 @@ namespace Elastos {
 			if (_idCache != NULL)
 				return true;
 
-			fs::path idCachePath = _pathRoot;
+			fs::path idCachePath = Enviroment::GetRootPath();
 			idCachePath /= IDCACHE_DIR_NAME;
 
 			_idCache =IdCachePtr(new IdCache(idCachePath));
