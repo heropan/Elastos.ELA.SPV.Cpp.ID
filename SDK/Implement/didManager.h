@@ -124,6 +124,7 @@ namespace Elastos {
 
 
 			Elastos::ElaWallet::MasterWallet*	_masterWallet;
+			//IIdAgent
 			Elastos::ElaWallet::IIdAgent*	    _iidAgent;
 		};
 	}
