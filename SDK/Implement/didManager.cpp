@@ -122,10 +122,12 @@ namespace Elastos {
 
 			ParamChecker::checkPassword(password);
 
-			uint32_t index =  _iidAgent->GetAllIds().size();
+			std::vector<std::string> allIdsVec = _masterWallet->GetAllIds();
+
+			uint32_t index =  allIdsVec.size();
 
 			std::string didNameStr = "";
-			didNameStr = _iidAgent->DeriveIdAndKeyForPurpose(1 , index , password);
+			didNameStr = _masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
 
 
 
