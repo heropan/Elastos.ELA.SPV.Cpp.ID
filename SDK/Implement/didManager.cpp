@@ -112,7 +112,8 @@ namespace Elastos {
 
 			_masterWallet = (Elastos::ElaWallet::MasterWallet*)masterWallet;
 			//_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
-			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(masterWallet);
+			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(_masterWallet);
+			ParamChecker::checkNullPointer(_iidAgent);
 			initSpvModule();
 			initIdCache();
 		}
@@ -122,12 +123,12 @@ namespace Elastos {
 
 			ParamChecker::checkPassword(password);
 
-			std::vector<std::string> allIdsVec = _masterWallet->GetAllIds();
+			std::vector<std::string> allIdsVec = _iidAgent->GetAllIds();
 
 			uint32_t index =  allIdsVec.size();
 
 			std::string didNameStr = "";
-			didNameStr = _masterWallet->DeriveIdAndKeyForPurpose(1 , index , password);
+			didNameStr = _iidAgent->DeriveIdAndKeyForPurpose(1 , index , password);
 
 
 
