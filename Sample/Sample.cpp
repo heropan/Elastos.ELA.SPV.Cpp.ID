@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 	initMasterWallet();
 
 
-	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet);
+	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet, "Data");
 	std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;
 

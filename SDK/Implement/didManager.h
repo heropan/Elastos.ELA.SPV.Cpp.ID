@@ -26,7 +26,7 @@ namespace Elastos {
 		{
 		public:
 
-			CDidManager(ElaWallet::IMasterWallet* masterWallet) ;
+			CDidManager(ElaWallet::IMasterWallet* masterWallet, const std::string &rootPath) ;
 
 			virtual ~CDidManager();
 

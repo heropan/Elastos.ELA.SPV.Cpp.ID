@@ -8,8 +8,8 @@
 namespace Elastos {
 	namespace DID {
 
-		IDIDManager* IdManagerFactory::CreateIdManager(ElaWallet::IMasterWallet* masterWallet) {
-			return new CDidManager(masterWallet);
+		IDIDManager* IdManagerFactory::CreateIdManager(ElaWallet::IMasterWallet* masterWallet, const std::string &rootPath) {
+			return new CDidManager(masterWallet, rootPath);
 		}
 
 	}

@@ -106,8 +106,8 @@ namespace Elastos {
 
 		}
 
-		CDidManager::CDidManager(IMasterWallet* masterWallet)
-			: _pathRoot("Data") {
+		CDidManager::CDidManager(IMasterWallet* masterWallet, const std::string &rootPath)
+			: _pathRoot(rootPath) {
 			ParamChecker::checkNullPointer(masterWallet);
 
 			_masterWallet = (Elastos::ElaWallet::MasterWallet*)masterWallet;
@@ -277,7 +277,7 @@ namespace Elastos {
 			if (_idCache != NULL)
 				return true;
 
-			fs::path idCachePath = Enviroment::GetRootPath();
+			fs::path idCachePath = _pathRoot;
 			idCachePath /= IDCACHE_DIR_NAME;
 
 			_idCache =IdCachePtr(new IdCache(idCachePath));
