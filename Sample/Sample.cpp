@@ -20,12 +20,15 @@ using namespace Elastos::DID;
 IMasterWallet *masterWallet = nullptr;
 std::string payPassword = "payPassword";
 
+
+
 class TestMasterWalletManager : public MasterWalletManager {
 public:
 	TestMasterWalletManager() : MasterWalletManager("Data") {
 	}
 };
 
+boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
 
 class TestCallback : public IIdManagerCallback {
 public:
@@ -39,7 +42,7 @@ public:
 
 void initMasterWallet() {
 
-	boost::scoped_ptr<TestMasterWalletManager> masterWalletManager(new TestMasterWalletManager());
+
 	std::string mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
 	std::string phrasePassword = "";
 	std::string payPassword = "idPassword";
@@ -69,11 +72,18 @@ std::string registerId(IDIDManager *idManager) {
 	return id;
 }
 
+void DestroyMasterWallet(){
+	if (masterWallet){
+		masterWalletManager->DestroyWallet(masterWallet->GetId());
+	}
+
+}
+
 int main(int argc, char *argv[]) {
 
 	//Enviroment::InitializeRootPath("Data");
 	//initMasterWallet();
-
+	//DestroyMasterWallet();
 	IdManagerFactory idManagerFactory;
 
 	initMasterWallet();
