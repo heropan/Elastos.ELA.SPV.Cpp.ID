@@ -144,6 +144,13 @@ namespace Elastos {
 			return keysJson;
 		}
 
+		nlohmann::json CDid::GenerateProgram(
+			const std::string &message,
+			const std::string &password){
+
+			return _didManger->_masterWallet->GenerateProgram(_didNameStr, message, password);
+		}
+
 		//key password ？
 		std::string CDid::Sign(
 			const std::string &message , const std::string &password){

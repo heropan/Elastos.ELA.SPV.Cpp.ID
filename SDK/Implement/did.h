@@ -39,6 +39,10 @@ namespace Elastos {
 				uint32_t start,
 				uint32_t count) const ;
 
+			virtual nlohmann::json GenerateProgram(
+				const std::string &message,
+				const std::string &password);
+
 			virtual std::string Sign(
 				const std::string &message, const std::string &password) ;
 
