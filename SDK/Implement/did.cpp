@@ -175,7 +175,7 @@ namespace Elastos {
 			BRSHA256(&md, message.c_str(), message.size());
 
 
-			bool r = Key::verifyByPublicKey(_didNameStr, md, signatureData);
+			bool r = Key::verifyByPublicKey(GetPublicKey(), md, signatureData);
 			nlohmann::json jsonData;
 			jsonData["Result"] = r;
 			return jsonData;
