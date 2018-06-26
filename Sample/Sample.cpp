@@ -3,7 +3,6 @@
 #include <cassert>
 #include <boost/scoped_ptr.hpp>
 #include <climits>
-#include <Interface/Enviroment.h>
 
 #include "IdManager.h"
 #include "leveldb/db.h"
@@ -23,7 +22,7 @@ std::string payPassword = "payPassword";
 
 class TestMasterWalletManager : public MasterWalletManager {
 public:
-	TestMasterWalletManager() : MasterWalletManager(MasterWalletMap()) {
+	TestMasterWalletManager() : MasterWalletManager("Data") {
 	}
 };
 
@@ -45,13 +44,13 @@ void initMasterWallet() {
 	std::string phrasePassword = "";
 	std::string payPassword = "idPassword";
 	std::string masterWalletId = "MasterWalletId";
-	masterWallet = masterWalletManager->ImportWalletWithMnemonic(masterWalletId, mnemonic, phrasePassword, payPassword);
+	//masterWallet = masterWalletManager->ImportWalletWithMnemonic(masterWalletId, mnemonic, phrasePassword, payPassword);
 
-	masterWallet = masterWalletManager->CreateMasterWallet("123456", "english");
+	masterWallet = masterWalletManager->CreateMasterWallet("123456", mnemonic , phrasePassword, payPassword , "english");
 
 
-	masterWalletManager->InitializeMasterWallet(masterWallet->GetId(), mnemonic, phrasePassword,
-												payPassword);
+	//masterWalletManager->InitializeMasterWallet(masterWallet->GetId(), mnemonic, phrasePassword,
+												//payPassword);
 
 
 }
@@ -72,8 +71,8 @@ std::string registerId(IDIDManager *idManager) {
 
 int main(int argc, char *argv[]) {
 
-	Enviroment::InitializeRootPath("Data");
-	initMasterWallet();
+	//Enviroment::InitializeRootPath("Data");
+	//initMasterWallet();
 
 	IdManagerFactory idManagerFactory;
 

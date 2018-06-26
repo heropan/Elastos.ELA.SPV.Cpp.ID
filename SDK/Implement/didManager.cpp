@@ -16,7 +16,6 @@
 #include "SDK/ELACoreExt/ELATransaction.h"
 #include <SDK/Common/ParamChecker.h>
 #include "Interface/IMasterWallet.h"
-#include "Interface/Enviroment.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
@@ -123,7 +122,7 @@ namespace Elastos {
 
 			ParamChecker::checkPassword(password);
 
-			std::vector<std::string> allIdsVec = _iidAgent->GetAllIds();
+			std::vector<std::string> allIdsVec = _masterWallet->GetAllIds();
 
 			uint32_t index =  allIdsVec.size();
 
