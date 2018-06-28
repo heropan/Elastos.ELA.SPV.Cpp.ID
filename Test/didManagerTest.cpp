@@ -219,3 +219,41 @@ TEST_CASE( "GetDIDList func test", "[didManagerTest]" )
 	DestroyMasterWallet();
 
 }
+
+
+
+TEST_CASE( "simulate android app", "[didManagerTest]" )
+{
+	//Enviroment::InitializeRootPath("Data");
+
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+
+	SECTION("GetDIDList") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json didListJson = didManager->GetDIDList();
+
+		std::cout<<"didListJson1 "<<didListJson <<std::endl;
+
+		IDID * idID = didManager->CreateDID(payPassword);
+
+		didListJson = didManager->GetDIDList();
+		std::cout<<"didListJson2 "<<didListJson <<std::endl;
+		//CHECK_NOTHROW(didManager->GetDIDList());
+
+//		IDID * idID = didManager->CreateDID(payPassword);
+//		REQUIRE(idID != nullptr);
+//
+//		std::string dIDName = "";
+//		dIDName = idID->GetDIDName();
+//
+//		REQUIRE(dIDName != "");
+//		CHECK_NOTHROW(didManager->DestoryDID(dIDName));
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}

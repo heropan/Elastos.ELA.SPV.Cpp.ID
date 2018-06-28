@@ -131,8 +131,14 @@ namespace Elastos {
 			std::string didNameStr = "";
 			didNameStr = _iidAgent->DeriveIdAndKeyForPurpose(1 , index , password);
 
+			std::cout<<"new didNameStr " <<didNameStr <<std::endl;
+			nlohmann::json defJson ={
+				{"121", {{"datahash", "datahash1"}, {"proof", "hello proof1"}, {"sign", "hello sign1"}}},
+				{"132", {{"datahash", "datahash2"}, {"proof", "hello proof2"}, {"sign", "hello sign2"}}},
+				{"103", {{"datahash", "datahash3"}, {"proof", "hello proof3"}, {"sign", "hello sign3"}}}
+			};
 
-
+			_idCache->Put(didNameStr, "", defJson);
 			return NewDid(didNameStr);
 		}
 

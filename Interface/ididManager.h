@@ -25,9 +25,9 @@ namespace Elastos {
 
 			virtual void  DestoryDID(const std::string &didName) = 0;
 
-//			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback)= 0;
-//
-//			virtual bool  UnregisterCallback(const std::string &id)= 0;
+			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback)= 0;
+
+			virtual bool  UnregisterCallback(const std::string &id)= 0;
 		};
 
 	}

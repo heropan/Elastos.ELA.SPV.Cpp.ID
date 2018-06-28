@@ -16,13 +16,14 @@
 #include "MasterWallet.h"
 #include "Interface/IIdAgent.h"
 #include "Interface/ISubWallet.h"
+#include "Interface/ISubWalletCallback.h"
 
 namespace Elastos {
 	namespace DID {
 		class SpvListener;
 
 
-		class CDidManager : public IDIDManager
+		class CDidManager : public IDIDManager, public ElaWallet::ISubWalletCallback
 		{
 		public:
 
@@ -40,15 +41,23 @@ namespace Elastos {
 
 			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
 			virtual bool  UnregisterCallback(const std::string &id);
-		protected:
-			friend class SpvListener;
-
 
 			virtual void OnTransactionStatusChanged(
 				const std::string &id,
 				const std::string &status,
 				const nlohmann::json &desc,
 				uint32_t blockHeight);
+		protected:
+			friend class SpvListener;
+
+/*
+ * virtual void OnTransactionStatusChanged(
+					const std::string &txid,
+					const std::string &status,
+					const nlohmann::json &desc,
+					uint32_t confirms) = 0;
+ * */
+
 
 			void updateDatabase(const std::string &id,
 								const std::string &path,
