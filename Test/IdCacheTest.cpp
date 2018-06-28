@@ -317,7 +317,28 @@ TEST_CASE( "IdCache test", "[IdCache]" )
 			}
 		}
 	}
+	SECTION("IdCache GetAll") {
 
+		IdCache idCache(IdCachePath);
+		nlohmann::json jsonGet;
+
+		for (nlohmann::json::iterator it = id1Json.begin(); it != id1Json.end(); it++) {
+			std::string tagPath = it.key();
+			REQUIRE(idCache.Put("id1", tagPath, it.value()));
+		}
+
+		for (nlohmann::json::iterator it = id2Json.begin(); it != id2Json.end(); it++) {
+			std::string tagPath = it.key();
+			REQUIRE(idCache.Put("id2", tagPath, it.value()));
+		}
+
+		for (nlohmann::json::iterator it = id3Json.begin(); it != id3Json.end(); it++) {
+			std::string tagPath = it.key();
+			REQUIRE(idCache.Put("id3", tagPath, it.value()));
+		}
+		nlohmann::json jsonRet =idCache.GetAllKey();
+		std::cout<<"GetAllKey jsonRet" <<jsonRet<<std::endl;
+	}
 	SECTION("IdCache delete all") {
 	}
 

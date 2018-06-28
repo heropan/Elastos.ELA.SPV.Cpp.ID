@@ -24,6 +24,8 @@ namespace Elastos {
 			bool Put(const std::string &id, const std::string &path, const nlohmann::json &pathJson);
 			bool Put(const std::string &id, const std::string &path, uint32_t blockHeight, const nlohmann::json &blockHeighJson);
 
+			nlohmann::json GetAllKey();
+
 			nlohmann::json Get(const std::string &id) const;
 			nlohmann::json Get(const std::string &id, const std::string &path) const;
 			nlohmann::json Get(const std::string &id, const std::string &path, uint32_t blockHeight) const;

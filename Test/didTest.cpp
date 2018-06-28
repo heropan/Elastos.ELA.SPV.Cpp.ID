@@ -136,6 +136,44 @@ TEST_CASE( "GetDIDName  test", "[didTest]" )
 }
 
 
+TEST_CASE( "CreateDID  test", "[didTest]" )
+{
+	//Enviroment::InitializeRootPath("Data");
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+
+	SECTION("GetDIDName didNameStr empty str") {
+
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		IDID * idID = didManager->CreateDID(payPassword);
+		REQUIRE(idID != nullptr);
+
+		std::string dIDName1 = "";
+		dIDName1 = idID->GetDIDName();
+		std::cout << "dIDName1 " << dIDName1  << std::endl;
+		REQUIRE(dIDName1 != "");
+
+
+		//////////////////////
+		IDID * idID2 = didManager->CreateDID(payPassword);
+		REQUIRE(idID2 != nullptr);
+
+		std::string dIDName2 = "";
+		dIDName2 = idID2->GetDIDName();
+
+		REQUIRE(dIDName2 != "");
+		std::cout << "dIDName2 " << dIDName2  << std::endl;
+		//////////////////////
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
+
 TEST_CASE( "SetValue  test", "[didTest]" )
 {
 	//Enviroment::InitializeRootPath("Data");

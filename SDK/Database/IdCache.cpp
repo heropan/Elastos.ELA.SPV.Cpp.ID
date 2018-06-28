@@ -103,6 +103,19 @@ namespace Elastos {
 			return true;
 		}
 
+		nlohmann::json IdCache::GetAllKey(){
+
+			nlohmann::json allkeyJson;
+			leveldb::Iterator* it = _db->NewIterator(leveldb::ReadOptions());
+			for (it->SeekToFirst(); it->Valid(); it->Next()) {
+				//std::cout << it->key().ToString() << ": "  << it->value().ToString() << std::endl;
+				allkeyJson.push_back(it->key().ToString());
+			}
+			assert(it->status().ok());  // Check for any errors found during the scan
+			delete it;
+			return allkeyJson;
+		}
+
 		nlohmann::json IdCache::Get(const std::string &id) const {
 			if (!Initialized()) {
 				return nlohmann::json();

@@ -8,10 +8,12 @@
 #include "nlohmann/json.hpp"
 
 #include "idid.h"
+#include "IIdManagerCallback.h"
+
 
 namespace Elastos {
 	namespace DID {
-
+		//class IIdManagerCallback;
 		class IDIDManager{
 		public:
 
@@ -22,6 +24,10 @@ namespace Elastos {
 			virtual nlohmann::json GetDIDList() const = 0;
 
 			virtual void  DestoryDID(const std::string &didName) = 0;
+
+//			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback)= 0;
+//
+//			virtual bool  UnregisterCallback(const std::string &id)= 0;
 		};
 
 	}

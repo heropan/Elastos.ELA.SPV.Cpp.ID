@@ -30,7 +30,8 @@ using namespace Elastos::ElaWallet;
 namespace Elastos {
 	namespace DID {
 
-		class SpvListener : public Wallet::Listener {
+		//ISubWalletCallback
+		class SpvListener : public Wallet::Listener{
 		public:
 			SpvListener(CDidManager *manager) : _manager(manager) {
 			}
@@ -145,14 +146,16 @@ namespace Elastos {
 
 		nlohmann::json CDidManager::GetDIDList() const {
 
-			nlohmann::json didJson;
+//			nlohmann::json didJson;
+//
+//			DidMap::const_iterator itor  = _didMap.begin() ;
+//			for (itor  =  _didMap.begin() ; itor != _didMap.end(); itor++) {
+//
+//				didJson.push_back(itor->first);
+//			}
+//			return didJson ;
 
-			DidMap::const_iterator itor  = _didMap.begin() ;
-			for (itor  =  _didMap.begin() ; itor != _didMap.end(); itor++) {
-
-				didJson.push_back(itor->first);
-			}
-			return didJson ;
+			return _idCache->GetAllKey();
 		}
 
 		void  CDidManager::DestoryDID(const std::string &didName){
@@ -231,8 +234,8 @@ namespace Elastos {
 //			_walletManager = WalletManagerPtr(
 //				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
 //
-//			_walletManager->registerWalletListener(_spvListener.get());
-
+			//_walletManager->registerWalletListener(_spvListener.get());
+			//_masterWallet->
 		}
 
 		void CDidManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,
@@ -309,6 +312,14 @@ namespace Elastos {
 				}
 			}
 
+			nlohmann::json jsonRet = _idCache->GetAllKey();
+
+			//std::cout << "jsonRet "<< jsonRet <<std::endl;
+
+			for (nlohmann::json::const_iterator it = jsonRet.begin(); it != jsonRet.end(); it++) {
+				//std::cout << "value "<< it.value()<<std::endl;
+				NewDid(it.value());
+			}
 			return true;
 		}
 

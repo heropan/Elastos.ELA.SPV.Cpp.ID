@@ -38,7 +38,8 @@ namespace Elastos {
 
 			virtual void  DestoryDID(const std::string &didName);
 
-
+			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
+			virtual bool  UnregisterCallback(const std::string &id);
 		protected:
 			friend class SpvListener;
 
@@ -66,8 +67,7 @@ namespace Elastos {
 
 			bool initIdCache();
 
-			bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
-			bool  UnregisterCallback(const std::string &id);
+
 			void  RecoverIds(const std::vector<std::string> &ids, const std::vector<std::string> &keys,
 									   const std::vector<std::string> &passwords);
 
