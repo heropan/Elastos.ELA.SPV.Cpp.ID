@@ -275,9 +275,105 @@ TEST_CASE( "GetValue  test", "[didTest]" )
 
 }
 
+TEST_CASE( "GetAllKeys  test", "[didTest]" )
+{
+	//Enviroment::InitializeRootPath("Data");
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+
+	//SECTION("GetDIDName didNameStr empty str") {
+
+		nlohmann::json id1Json = {
+			{"path1", {
+						  {"101", {{"datahash", "datahash1"}, {"proof", "hello proof1"}, {"sign", "hello sign1"}}},
+						  {"102", {{"datahash", "datahash2"}, {"proof", "hello proof2"}, {"sign", "hello sign2"}}},
+						  {"103", {{"datahash", "datahash3"}, {"proof", "hello proof3"}, {"sign", "hello sign3"}}}
+					  }},
+			{"path2", {
+						  {"104", {{"DataHash", "DataHash1"}, {"Proof", "hello proof1"}, {"Sign", "hello sign1"}}},
+						  {"105", {{"DataHash", "DataHash2"}, {"Proof", "hello proof2"}, {"Sign", "hello sign2"}}},
+						  {"106", {{"DataHash", "DataHash3"}, {"Proof", "hello proof3"}, {"Sign", "hello sign3"}}}
+					  }},
+			{"path3", {
+						  {"107", {{"DataHash", "DataHash1"}, {"Proof", "hello proof1"}, {"Sign", "hello sign1"}}},
+						  {"108", {{"DataHash", "DataHash2"}, {"Proof", "hello proof2"}, {"Sign", "hello sign2"}}},
+						  {"109", {{"DataHash", "DataHash3"}, {"Proof", "hello proof3"}, {"Sign", "hello sign3"}}}
+					  }}
+		};
+
+//		initMasterWallet();
+//		CDidManager* didManager = NULL;
+
+		SECTION("GetAllKeys str") {
+			didManager = new CDidManager(masterWallet, "Data");
+			REQUIRE(didManager != nullptr);
+
+			IDID * idID = didManager->CreateDID(payPassword);
+			REQUIRE(idID != nullptr);
+
+
+			for (nlohmann::json::iterator it = id1Json.begin(); it != id1Json.end(); it++) {
+				std::string tagPath = it.key();
+				idID->SetValue(tagPath, it.value());
+			}
+
+
+			nlohmann::json jsonRet;
+			jsonRet = idID->GetAllKeys(0,  100);
+
+
+
+			nlohmann::json path1Json = {
+				"",
+				"path1",
+				"path2",
+				"path3"
+			};
+			std::cout << jsonRet << std::endl;
+			REQUIRE(jsonRet == path1Json);
+
+			delete didManager;
+			didManager = NULL;
+	}
+
+	SECTION("didManager didNameStr empty str") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		IDID * idID = didManager->CreateDID(payPassword);
+		REQUIRE(idID != nullptr);
+
+
+		for (nlohmann::json::iterator it = id1Json.begin(); it != id1Json.end(); it++) {
+			std::string tagPath = it.key();
+			idID->SetValue(tagPath, it.value());
+		}
+
+
+		nlohmann::json jsonRet;
+		jsonRet = idID->GetAllKeys(0,  100);
+
+
+
+		nlohmann::json path1Json = {
+			"",
+			"path1",
+			"path2",
+			"path3"
+		};
+		std::cout << jsonRet << std::endl;
+		REQUIRE(jsonRet == path1Json);
+
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
 //TEST_CASE( "GetAllKeys  test", "[didTest]" )
 //{
-//	//Enviroment::InitializeRootPath("Data");
+	//Enviroment::InitializeRootPath("Data");
 //	SECTION("didManager didNameStr empty str") {
 //
 //		nlohmann::json id1Json = {
@@ -373,22 +469,6 @@ TEST_CASE( "GetPublicKey test", "[didTest]" )
 	//Enviroment::InitializeRootPath("Data");
 	initMasterWallet();
 	CDidManager* didManager = NULL;
-//	SECTION("GetPublicKey test itator") {
-//
-//		std::map<int, int> intMap;
-//
-//		for(int i = 0; i< 10; i++){
-//			intMap[i] = i;
-//		}
-//		std::map<int, int>::iterator itor =intMap.begin();
-//
-//		std::advance (itor, 5);
-//
-//		for ( ; itor != intMap.end(); ++itor) {
-//			std::cout<<itor->second <<std::endl;
-//		}
-//		std::cout<<"itator test" <<std::endl;
-//	}
 	SECTION("GetPublicKey normal ok") {
 		didManager = new CDidManager(masterWallet, "Data");
 		REQUIRE(didManager != nullptr);
