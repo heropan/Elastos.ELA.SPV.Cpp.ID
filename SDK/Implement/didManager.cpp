@@ -14,7 +14,8 @@
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
 #include "SDK/ELACoreExt/ELATransaction.h"
-#include <SDK/Common/ParamChecker.h>
+#include "SDK/Common/ParamChecker.h"
+#include "SDK/Common/Log.h"
 #include "Interface/IMasterWallet.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
