@@ -18,6 +18,7 @@
 #include "Interface/ididManager.h"
 #include "Interface/idid.h"
 #include "Implement/didManager.h"
+#include "SDK/Common/Log.h"
 
 using namespace Elastos::ElaWallet;
 using namespace Elastos::DID;
@@ -251,6 +252,152 @@ TEST_CASE( "simulate android app", "[didManagerTest]" )
 //
 //		REQUIRE(dIDName != "");
 //		CHECK_NOTHROW(didManager->DestoryDID(dIDName));
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
+class ManagerCallback : public IIdManagerCallback {
+public:
+	ManagerCallback()  {
+	}
+	virtual void OnIdStatusChanged(
+		const std::string &id,
+		const std::string &path,
+		const nlohmann::json &value){
+
+		Log::getLogger()->warn("ManagerCallback::OnIdStatusChanged id = {} path {} value {} begin"
+						 , id, path ,  value.dump());
+	}
+};
+
+TEST_CASE( "RegisterCallback", "[didManagerTest]" )
+{
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+	ManagerCallback loCallback1;
+	ManagerCallback loCallback2;
+	//ManagerCallback loCallback3;
+	SECTION("RegisterCallback normal") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json didListJson = didManager->GetDIDList();
+
+
+		IDID * idID1 = didManager->CreateDID(payPassword);
+		std::string did1Name = idID1->GetDIDName() ;
+
+		didManager->RegisterCallback(did1Name, &loCallback1);
+
+		//didListJson = didManager->GetDIDList();
+		std::cout<<"didListJson2 "<<didListJson <<std::endl;
+
+		delete didManager;
+		didManager = NULL;
+	}
+	SECTION("RegisterCallback twice") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json didListJson = didManager->GetDIDList();
+
+
+		IDID * idID1 = didManager->CreateDID(payPassword);
+		std::string did1Name = idID1->GetDIDName() ;
+
+		didManager->RegisterCallback(did1Name, &loCallback1);
+		didManager->RegisterCallback(did1Name, &loCallback1);
+		//didListJson = didManager->GetDIDList();
+		std::cout<<"didListJson2 "<<didListJson <<std::endl;
+
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
+TEST_CASE( "UnregisterCallback", "[didManagerTest]" )
+{
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+	ManagerCallback loCallback1;
+	ManagerCallback loCallback2;
+	//ManagerCallback loCallback3;
+	SECTION("UnregisterCallback normal") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json didListJson = didManager->GetDIDList();
+
+
+		IDID * idID1 = didManager->CreateDID(payPassword);
+		std::string did1Name = idID1->GetDIDName() ;
+
+		didManager->RegisterCallback(did1Name, &loCallback1);
+
+		didManager->UnregisterCallback(did1Name);
+
+		//didListJson = didManager->GetDIDList();
+		std::cout<<"didListJson2 "<<didListJson <<std::endl;
+
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
+TEST_CASE( "OnTransactionStatusChanged", "[didManagerTest]" )
+{
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+	ManagerCallback loCallback1;
+	ManagerCallback loCallback2;
+	//ManagerCallback loCallback3;
+
+	SECTION("GetDIDList") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json didListJson = didManager->GetDIDList();
+
+
+		IDID * idID1 = didManager->CreateDID(payPassword);
+		std::string did1Name = idID1->GetDIDName() ;
+
+		IDID * idID2 = didManager->CreateDID(payPassword);
+		std::string did1Name2 = idID2->GetDIDName() ;
+
+		didManager->RegisterCallback(did1Name, &loCallback1);
+		didManager->RegisterCallback(did1Name2, &loCallback2);
+
+		const std::string status = "ok";
+
+		nlohmann::json defJson ={
+			{"121", {{"datahash", "datahash1"}, {"proof", "hello proof1"}, {"sign", "hello sign1"}}},
+			{"132", {{"datahash", "datahash2"}, {"proof", "hello proof2"}, {"sign", "hello sign2"}}},
+			{"103", {{"datahash", "datahash3"}, {"proof", "hello proof3"}, {"sign", "hello sign3"}}}
+		};
+
+		nlohmann::json defJson2 ={
+			{"221", {{"datahash", "datahash1"}, {"proof", "hello proof1"}, {"sign", "hello sign1"}}},
+			{"232", {{"datahash", "datahash2"}, {"proof", "hello proof2"}, {"sign", "hello sign2"}}},
+			{"203", {{"datahash", "datahash3"}, {"proof", "hello proof3"}, {"sign", "hello sign3"}}}
+		};
+		std::cout<<"did1Name "<<did1Name <<std::endl;
+		std::cout<<"did1Name2 "<<did1Name2 <<std::endl;
+
+		didManager->OnTransactionStatusChanged(did1Name, status, defJson, 101);
+		didManager->OnTransactionStatusChanged(did1Name2, status, defJson2, 102);
+
+		didManager->UnregisterCallback(did1Name);
+		didManager->UnregisterCallback(did1Name2);
+
+
 		delete didManager;
 		didManager = NULL;
 	}

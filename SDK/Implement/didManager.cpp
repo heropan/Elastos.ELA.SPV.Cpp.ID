@@ -210,24 +210,24 @@ namespace Elastos {
 											  const nlohmann::json &desc, uint32_t blockHeight) {
 
 			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged");
-			std::string path = desc["Path"].get<std::string>();
-			nlohmann::json value;
-			if (status == "Added" || status == "Updated") {
-				value.push_back(desc["DataHash"]);
-				value.push_back(desc["Proof"]);
-				value.push_back(desc["Sign"]);
-				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before updateDatabase");
-				updateDatabase(id, path, value, blockHeight);
-			} else if (status == "Deleted") {
-				value = GetLastIdValue(id, path);
-
-				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before removeIdItem");
-
-				removeIdItem(id, path, blockHeight);
-			}
+//			std::string path = desc["Path"].get<std::string>();
+//			nlohmann::json value;
+//			if (status == "Added" || status == "Updated") {
+//				value.push_back(desc["DataHash"]);
+//				value.push_back(desc["Proof"]);
+//				value.push_back(desc["Sign"]);
+//				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before updateDatabase");
+//				updateDatabase(id, path, value, blockHeight);
+//			} else if (status == "Deleted") {
+//				value = GetLastIdValue(id, path);
+//
+//				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before removeIdItem");
+//
+//				removeIdItem(id, path, blockHeight);
+//			}
 
 			if (_idListenerMap.find(id) != _idListenerMap.end())
-				_idListenerMap[id]->FireCallbacks(id, status, value);
+				_idListenerMap[id]->FireCallbacks(id, status, desc);
 		}
 
 		void CDidManager::initSpvModule() {
@@ -365,6 +365,7 @@ namespace Elastos {
 		bool	CDidManager::RegisterCallback(const std::string &id, IIdManagerCallback *callback) {
 			Log::getLogger()->info("RegisterCallback  begin id {} callback {:p}", id, ( void* )callback);
 
+
 			if (_idListenerMap.find(id) == _idListenerMap.end()) {
 				_idListenerMap[id] = ListenerPtr(new SubWalletListener(this));
 			}
@@ -380,7 +381,7 @@ namespace Elastos {
 
 			if (_idListenerMap.find(id) == _idListenerMap.end())
 				return false;
-
+			//?????????是不是 需要删除指针
 			_idListenerMap.erase(id);
 			Log::getLogger()->info("UnregisterCallback  end id {} ", id);
 
