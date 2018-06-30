@@ -268,7 +268,7 @@ public:
 		const std::string &path,
 		const nlohmann::json &value){
 
-		Log::getLogger()->warn("ManagerCallback::OnIdStatusChanged id = {} path {} value {} begin"
+		Log::getLogger()->info("ManagerCallback::OnIdStatusChanged id = {} path {} value {} begin"
 						 , id, path ,  value.dump());
 	}
 };

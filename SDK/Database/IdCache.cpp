@@ -105,14 +105,24 @@ namespace Elastos {
 
 		nlohmann::json IdCache::GetAllKey(){
 
+			Log::getLogger()->warn("GetAllKey begin");
+			if (!Initialized()) {
+				return nlohmann::json();
+			}
 			nlohmann::json allkeyJson;
+			Log::getLogger()->warn("GetAllKey before _db->NewIterator");
 			leveldb::Iterator* it = _db->NewIterator(leveldb::ReadOptions());
+			Log::getLogger()->warn("GetAllKey before for");
 			for (it->SeekToFirst(); it->Valid(); it->Next()) {
 				//std::cout << it->key().ToString() << ": "  << it->value().ToString() << std::endl;
+				Log::getLogger()->warn("it->key() {}", it->key().ToString());
 				allkeyJson.push_back(it->key().ToString());
 			}
+			Log::getLogger()->warn("GetAllKey before delete");
+
 			assert(it->status().ok());  // Check for any errors found during the scan
 			delete it;
+			Log::getLogger()->warn("GetAllKey end");
 			return allkeyJson;
 		}
 

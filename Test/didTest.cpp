@@ -321,7 +321,7 @@ TEST_CASE( "GetAllKeys  test", "[didTest]" )
 			nlohmann::json jsonRet;
 			jsonRet = idID->GetAllKeys(0,  100);
 
-
+			jsonRet = idID->GetAllKeys(0,  100);
 
 			nlohmann::json path1Json = {
 				"",

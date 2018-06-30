@@ -114,9 +114,9 @@ namespace Elastos {
 		CDidManager::CDidManager(IMasterWallet* masterWallet, const std::string &rootPath)
 			: _pathRoot(rootPath) {
 
-			Log::getLogger()->set_level(spdlog::level::err);
+			Log::getLogger()->set_level(spdlog::level::info);
 
-			Log::getLogger()->info("CDidManager::CDidManager rootPath = {} begin", rootPath);
+			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} begin", rootPath);
 
 			ParamChecker::checkNullPointer(masterWallet);
 
@@ -126,12 +126,12 @@ namespace Elastos {
 			ParamChecker::checkNullPointer(_iidAgent);
 			initSpvModule();
 			initIdCache();
-			Log::getLogger()->info("CDidManager::CDidManager rootPath = {} end", rootPath.c_str());
+			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} end", rootPath.c_str());
 		}
 
 		IDID * CDidManager::CreateDID(const std::string &password){
 
-			Log::getLogger()->info("CDidManager::CreateDID password = {} begin", password);
+			Log::getLogger()->debug("CDidManager::CreateDID password = {} begin", password);
 
 			ParamChecker::checkPassword(password);
 
@@ -172,14 +172,14 @@ namespace Elastos {
 //				didJson.push_back(itor->first);
 //			}
 //			return didJson ;
-			Log::getLogger()->info("GetDIDList begin");
+			Log::getLogger()->debug("GetDIDList begin");
 
 			return _idCache->GetAllKey();
 		}
 
 		void  CDidManager::DestoryDID(const std::string &didName){
 
-			Log::getLogger()->info("DestoryDID didName {} begin",  didName);
+			Log::getLogger()->debug("DestoryDID didName {} begin",  didName);
 			DidMap::iterator itor ;
 			itor = _didMap.find(didName);
 			if (itor == _didMap.end())
@@ -190,7 +190,7 @@ namespace Elastos {
 			delete idID;
 
 			_idCache->Delete(didName);
-			Log::getLogger()->info("DestoryDID didName {} end",  didName);
+			Log::getLogger()->debug("DestoryDID didName {} end",  didName);
 
 		}
 
@@ -209,19 +209,19 @@ namespace Elastos {
 		CDidManager::OnTransactionStatusChanged(const std::string &id, const std::string &status,
 											  const nlohmann::json &desc, uint32_t blockHeight) {
 
-			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged");
+			Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged");
 //			std::string path = desc["Path"].get<std::string>();
 //			nlohmann::json value;
 //			if (status == "Added" || status == "Updated") {
 //				value.push_back(desc["DataHash"]);
 //				value.push_back(desc["Proof"]);
 //				value.push_back(desc["Sign"]);
-//				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before updateDatabase");
+//				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged before updateDatabase");
 //				updateDatabase(id, path, value, blockHeight);
 //			} else if (status == "Deleted") {
 //				value = GetLastIdValue(id, path);
 //
-//				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged before removeIdItem");
+//				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged before removeIdItem");
 //
 //				removeIdItem(id, path, blockHeight);
 //			}
@@ -286,7 +286,7 @@ namespace Elastos {
 		}
 
 		ISubWallet * CDidManager::GetIDSubWallet(){
-			Log::getLogger()->info("GetIDSubWallet  begin");
+			Log::getLogger()->debug("GetIDSubWallet  begin");
 
 			std::vector<ISubWallet *> subWalletVec;
 			subWalletVec = _masterWallet->GetAllSubWallets();
@@ -299,15 +299,15 @@ namespace Elastos {
 				}
 				subWallet = NULL;
 			}
-			Log::getLogger()->info("GetIDSubWallet subWallet int: {:p} end", ( void* )subWallet);//{0:x}
+			Log::getLogger()->debug("GetIDSubWallet subWallet int: {:p} end", ( void* )subWallet);//{0:x}
 			return subWallet;
 		}
 
 		bool CDidManager::initIdCache() {
 
-			Log::getLogger()->info("initIdCache  begin");
+			Log::getLogger()->debug("initIdCache  begin");
 			if (_idCache != NULL){
-				Log::getLogger()->info("initIdCache  _idCache != NULL end");
+				Log::getLogger()->debug("initIdCache  _idCache != NULL end");
 				return false;
 			}
 
@@ -357,13 +357,13 @@ namespace Elastos {
 				//std::cout << "value "<< it.value()<<std::endl;
 				NewDid(it.value());
 			}
-			Log::getLogger()->info("initIdCache  end");
+			Log::getLogger()->debug("initIdCache  end");
 			return true;
 		}
 
 
 		bool	CDidManager::RegisterCallback(const std::string &id, IIdManagerCallback *callback) {
-			Log::getLogger()->info("RegisterCallback  begin id {} callback {:p}", id, ( void* )callback);
+			Log::getLogger()->debug("RegisterCallback  begin id {} callback {:p}", id, ( void* )callback);
 
 
 			if (_idListenerMap.find(id) == _idListenerMap.end()) {
@@ -371,30 +371,30 @@ namespace Elastos {
 			}
 
 			_idListenerMap[id]->AddCallback(callback);
-			Log::getLogger()->info("RegisterCallback  end id {} callback {:p}", id, ( void* )callback);
+			Log::getLogger()->debug("RegisterCallback  end id {} callback {:p}", id, ( void* )callback);
 
 			return true;
 		}
 
 		bool CDidManager::UnregisterCallback(const std::string &id) {
-			Log::getLogger()->info("UnregisterCallback  begin id {} ", id);
+			Log::getLogger()->debug("UnregisterCallback  begin id {} ", id);
 
 			if (_idListenerMap.find(id) == _idListenerMap.end())
 				return false;
 			//?????????是不是 需要删除指针
 			_idListenerMap.erase(id);
-			Log::getLogger()->info("UnregisterCallback  end id {} ", id);
+			Log::getLogger()->debug("UnregisterCallback  end id {} ", id);
 
 			return true;
 		}
 
 		IDID *  CDidManager::NewDid(const std::string didNameStr) {
-			Log::getLogger()->info("NewDid  begin didNameStr {} ", didNameStr);
+			Log::getLogger()->debug("NewDid  begin didNameStr {} ", didNameStr);
 
 			CDid * idID = new  CDid(this, didNameStr);
 			_didMap[didNameStr] =  idID;
 			RegisterId(didNameStr);
-			Log::getLogger()->info("NewDid  end didNameStr {} ", didNameStr);
+			Log::getLogger()->debug("NewDid  end didNameStr {} ", didNameStr);
 
 			return idID;
 		}
@@ -423,30 +423,30 @@ namespace Elastos {
 		}
 		void CDidManager::SubWalletListener::FireCallbacks(const std::string &id, const std::string &path,
 														 const nlohmann::json &value) {
-			Log::getLogger()->info("FireCallbacks  begin didNameStr id {} path{} value{}", id , path, value.dump());
+			Log::getLogger()->debug("FireCallbacks  begin didNameStr id {} path{} value{}", id , path, value.dump());
 
 			std::for_each(_callbacks.begin(), _callbacks.end(), [&id, &path, &value](IIdManagerCallback *callback) {
 				callback->OnIdStatusChanged(id, path, value);
 			});
-			Log::getLogger()->info("FireCallbacks  end didNameStr id {} path{} value{}", id , path, value.dump());
+			Log::getLogger()->debug("FireCallbacks  end didNameStr id {} path{} value{}", id , path, value.dump());
 		}
 
 		void CDidManager::SubWalletListener::AddCallback(IIdManagerCallback *managerCallback) {
-			Log::getLogger()->info("AddCallback  begin didNameStr {:p} ", ( void* )managerCallback);
+			Log::getLogger()->debug("AddCallback  begin didNameStr {:p} ", ( void* )managerCallback);
 
 			if (std::find(_callbacks.begin(), _callbacks.end(), managerCallback) != _callbacks.end())
 				return;
 			_callbacks.push_back(managerCallback);
-			Log::getLogger()->info("AddCallback  end didNameStr {:p} ", ( void* )managerCallback);
+			Log::getLogger()->debug("AddCallback  end didNameStr {:p} ", ( void* )managerCallback);
 
 		}
 
 		void CDidManager::SubWalletListener::RemoveCallback(IIdManagerCallback *managerCallback) {
-			Log::getLogger()->info("RemoveCallback  begin didNameStr {:p} ", ( void* )managerCallback);
+			Log::getLogger()->debug("RemoveCallback  begin didNameStr {:p} ", ( void* )managerCallback);
 
 			_callbacks.erase(std::remove(_callbacks.begin(), _callbacks.end(), managerCallback), _callbacks.end());
 
-			Log::getLogger()->info("RemoveCallback  end didNameStr {:p} ", ( void* )managerCallback);
+			Log::getLogger()->debug("RemoveCallback  end didNameStr {:p} ", ( void* )managerCallback);
 
 		}
 	}
