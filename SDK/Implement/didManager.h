@@ -10,14 +10,15 @@
 
 #include "nlohmann/json.hpp"
 #include "Interface/ididManager.h"
-#include "SDK/SpvService/WalletManager.h"
+//#include "SDK/SpvService/WalletManager.h"
 #include "IdCache.h"
-#include <SDK/IdAgent/IdAgentImpl.h>
-#include "MasterWallet.h"
+//#include <SDK/IdAgent/IdAgentImpl.h>
+//#include "MasterWallet.h"
 #include "Interface/IIdAgent.h"
 #include "Interface/ISubWallet.h"
 #include "Interface/ISubWalletCallback.h"
-
+#include "Interface/IMasterWallet.h"
+#include "Plugin/Interface/IMerkleBlock.h"
 namespace Elastos {
 	namespace DID {
 		class SpvListener;
@@ -113,7 +114,7 @@ namespace Elastos {
 			typedef boost::shared_ptr<SubWalletListener> ListenerPtr;
 			typedef std::map<std::string, ListenerPtr> IdListenerMap;
 
-			typedef boost::shared_ptr<ElaWallet::WalletManager> WalletManagerPtr;
+			//typedef boost::shared_ptr<ElaWallet::WalletManager> WalletManagerPtr;
 
 			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
 
@@ -132,7 +133,7 @@ namespace Elastos {
 			IdCachePtr _idCache;
 
 
-			Elastos::ElaWallet::MasterWallet*	_masterWallet;
+			Elastos::ElaWallet::IMasterWallet*	_masterWallet;
 			//IIdAgent
 			Elastos::ElaWallet::IIdAgent*	    _iidAgent;
 		};

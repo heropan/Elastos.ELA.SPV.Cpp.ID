@@ -9,7 +9,7 @@
 #include "SDK/Common/Utils.h"
 #include "SDK/Wrapper/Key.h"
 #include "SDK/Wrapper/AddressRegisteringWallet.h"
-#include "SDK/Implement/IdChainSubWallet.h"
+//#include "SDK/Implement/IdChainSubWallet.h"
 #include "SDK/Implement/MasterWallet.h"
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
@@ -22,7 +22,7 @@
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
 #define IDCACHE_DIR_NAME "IdCache"
 #define IDCHAIN_NAME     "IdChain"
-
+#include "MasterWallet.h"
 
 namespace fs = boost::filesystem;
 using namespace Elastos::ElaWallet;
@@ -46,12 +46,12 @@ namespace Elastos {
 
 			virtual void onTxAdded(const TransactionPtr &transaction) {
 
-				if (transaction->getTransactionType() != ELATransaction::RegisterIdentification)
-					return;
-
-				fireTransactionStatusChanged(
-					static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get()),
-					SubWalletCallback::Added, transaction->getBlockHeight());
+//				if (transaction->getTransactionType() != ELATransaction::RegisterIdentification)
+//					return;
+//
+//				fireTransactionStatusChanged(
+//					static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get()),
+//					SubWalletCallback::Added, transaction->getBlockHeight());
 			}
 
 			virtual void onTxUpdated(const std::string &hash, uint32_t blockHeight, uint32_t timeStamp) {
@@ -120,7 +120,7 @@ namespace Elastos {
 
 			ParamChecker::checkNullPointer(masterWallet);
 
-			_masterWallet = (Elastos::ElaWallet::MasterWallet*)masterWallet;
+			_masterWallet = masterWallet;//(Elastos::ElaWallet::MasterWallet*)
 			//_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
 			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(_masterWallet);
 			ParamChecker::checkNullPointer(_iidAgent);
@@ -135,12 +135,12 @@ namespace Elastos {
 
 			ParamChecker::checkPassword(password);
 
-			std::vector<std::string> allIdsVec = _masterWallet->GetAllIds();
+			std::vector<std::string> allIdsVec = _iidAgent->GetAllIds();
 
 			uint32_t index =  allIdsVec.size();
 
 			std::string didNameStr = "";
-			didNameStr = _iidAgent->DeriveIdAndKeyForPurpose(1 , index , password);
+			didNameStr = _iidAgent->DeriveIdAndKeyForPurpose(1 , index );//, password
 
 			std::cout<<"new didNameStr " <<didNameStr <<std::endl;
 			nlohmann::json defJson ={
@@ -337,7 +337,7 @@ namespace Elastos {
 
 
 					PayloadRegisterIdentification *payload =
-						static_cast<PayloadRegisterIdentification *>(transaction.getPayload().get());
+						static_cast<PayloadRegisterIdentification *>(transaction.getPayload());
 					uint32_t blockHeight = transaction.getBlockHeight();
 
 					nlohmann::json jsonToSave = payload->toJson();

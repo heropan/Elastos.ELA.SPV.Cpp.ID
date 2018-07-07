@@ -19,6 +19,7 @@
 #include "Interface/idid.h"
 #include "Implement/didManager.h"
 #include "SDK/Common/Log.h"
+#include "SDK/Implement/MasterWallet.h"
 
 using namespace Elastos::ElaWallet;
 using namespace Elastos::DID;

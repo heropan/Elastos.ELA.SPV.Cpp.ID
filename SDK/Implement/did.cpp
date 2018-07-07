@@ -7,6 +7,7 @@
 #include <SDK/Common/ParamChecker.h>
 #include "didManager.h"
 #include "SDK/Common/Log.h"
+#include "SDK/Wrapper/Key.h"
 
 namespace fs = boost::filesystem;
 
@@ -175,7 +176,7 @@ namespace Elastos {
 
 			Log::getLogger()->debug("CDid::GenerateProgram  begin message{}  password{}", message, password);
 
-			nlohmann::json jsonRet = _didManger->_masterWallet->GenerateProgram(_didNameStr, message, password);
+			nlohmann::json jsonRet = _didManger->_iidAgent->GenerateProgram(_didNameStr, message, password);
 
 			Log::getLogger()->debug("CDid::GenerateProgram  end message{}  password{} jsonRet{}"
 						  , message, password, jsonRet.dump());
@@ -191,7 +192,7 @@ namespace Elastos {
 
 			ParamChecker::checkNotEmpty(password);
 			CheckInit();
-			nlohmann::json jsonRet = _didManger->_masterWallet->Sign(_didNameStr, message, password);
+			nlohmann::json jsonRet = _didManger->_masterWallet->Sign( message, password);//_didNameStr,
 
 			Log::getLogger()->debug("CDid::GenerateProgram  end message{}  password{} jsonRet{}"
 				, message, password, jsonRet.dump());
@@ -227,7 +228,7 @@ namespace Elastos {
 			Log::getLogger()->debug("CDid::GetPublicKey  begin _didNameStr{}  ",  _didNameStr);
 
 			CheckInit();
-			std::string lostrPubkey = _didManger->_masterWallet->GetPublicKey(_didNameStr);
+			std::string lostrPubkey = _didManger->_masterWallet->GetPublicKey();//_didNameStr  ??????
 
 			Log::getLogger()->debug("CDid::GetPublicKey  end _didNameStr{} lostrPubkey {}"
 						  ,  _didNameStr, lostrPubkey);

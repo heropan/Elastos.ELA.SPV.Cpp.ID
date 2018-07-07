@@ -4,7 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <climits>
 
-#include "IdManager.h"
+//#include "IdManager.h"
 #include "leveldb/db.h"
 #include "Interface/IMasterWallet.h"
 #include "Interface/IdManagerFactory.h"
