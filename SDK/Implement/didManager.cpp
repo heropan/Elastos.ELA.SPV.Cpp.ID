@@ -116,13 +116,14 @@ namespace Elastos {
 
 			Log::getLogger()->set_level(spdlog::level::info);
 
-			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} begin", rootPath);
+			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
 			ParamChecker::checkNullPointer(masterWallet);
 
 			_masterWallet = masterWallet;//(Elastos::ElaWallet::MasterWallet*)
 			//_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
-			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(_masterWallet);
+			Elastos::ElaWallet::MasterWallet* pMasterWallet = (Elastos::ElaWallet::MasterWallet*)_masterWallet;
+			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(pMasterWallet);
 			ParamChecker::checkNullPointer(_iidAgent);
 			initSpvModule();
 			initIdCache();
@@ -229,6 +230,7 @@ namespace Elastos {
 			if (_idListenerMap.find(id) != _idListenerMap.end())
 				_idListenerMap[id]->FireCallbacks(id, status, desc);
 		}
+
 
 		void CDidManager::initSpvModule() {
 
