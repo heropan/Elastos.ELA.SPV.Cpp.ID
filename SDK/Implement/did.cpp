@@ -165,7 +165,7 @@ namespace Elastos {
 				}
 			}
 
-			Log::getLogger()->debug("CDid::GetAllKeys  begin start{}  count{} keysJson{}"
+			Log::getLogger()->debug("CDid::GetAllKeys  end start{}  count{} keysJson{}"
 						  , start, count, keysJson.dump());
 			return keysJson;
 		}

@@ -118,11 +118,11 @@ namespace Elastos {
 				Log::getLogger()->warn("it->key() {}", it->key().ToString());
 				allkeyJson.push_back(it->key().ToString());
 			}
-			Log::getLogger()->warn("GetAllKey before delete");
+			Log::getLogger()->warn("GetAllKey before delete ");
 
 			assert(it->status().ok());  // Check for any errors found during the scan
 			delete it;
-			Log::getLogger()->warn("GetAllKey end");
+			Log::getLogger()->warn("GetAllKey end allkeyJson ", allkeyJson.dump());
 			return allkeyJson;
 		}
 
