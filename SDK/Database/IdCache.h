@@ -10,6 +10,8 @@
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 #include <nlohmann/json.hpp>
+//#include <boost/function.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace Elastos {
 	namespace DID {
@@ -40,6 +42,7 @@ namespace Elastos {
 
 		private:
 			leveldb::DB* _db;
+			boost::mutex _lockMutex;
 		};
 
 	}

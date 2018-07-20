@@ -88,6 +88,20 @@ void DestroyMasterWallet(){
 
 }
 
+TEST_CASE( "test nlohmann/json  test", "[didTest]" )
+{
+
+
+	SECTION("nlohmann/json  test") {
+		nlohmann::json j;
+		j.push_back("foo");
+		j.push_back("foo2");
+		j.push_back("foo3");
+
+		Log::getLogger()->info("nlohmann/json !!!!!!!!!!!!!!!!!!!!!!! {}", j.dump());
+	}
+}
+
 TEST_CASE( "CDid constructor  test", "[didTest]" )
 {
 	//Enviroment::InitializeRootPath("Data");

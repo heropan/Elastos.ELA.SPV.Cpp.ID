@@ -90,6 +90,37 @@ std::string registerId(IDIDManager *idManager) {
 	return id;
 }
 
+TEST_CASE( "GetAllKeys func test", "[didManagerTest]" )
+{
+	//Enviroment::InitializeRootPath("Data");
+
+	initMasterWallet();
+	CDidManager* didManager = NULL;
+
+	SECTION("CreateDID") {
+		didManager = new CDidManager(masterWallet, "Data");
+		REQUIRE(didManager != nullptr);
+
+		nlohmann::json allPathJson;
+		allPathJson = didManager->GetDIDList();
+		Log::getLogger()->info("GetAllKeys func test1 ----------->allPathJson {}", allPathJson.dump());
+
+		//IDID * idID = didManager->CreateDID(payPassword);
+		//REQUIRE(idID != nullptr);
+//		int lz = 0;
+//
+//		int lc = 1;
+//		lc = lc /lz;
+		allPathJson = didManager->GetDIDList();
+
+		Log::getLogger()->info("GetAllKeys func test 2----------->allPathJson {}", allPathJson.dump());
+		delete didManager;
+		didManager = NULL;
+	}
+	DestroyMasterWallet();
+
+}
+
 TEST_CASE( "didManagerTest construct func test", "[didManagerTest]" )
 {
 	//Enviroment::InitializeRootPath("Data");

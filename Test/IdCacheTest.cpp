@@ -343,3 +343,43 @@ TEST_CASE( "IdCache test", "[IdCache]" )
 	}
 
 }
+
+
+using namespace Elastos::ElaWallet;
+using namespace Elastos::DID;
+TEST_CASE( "IdCache test nlohmann/json  test", "[didTest]" )
+{
+
+
+
+	SECTION("IdCache GetAll") {
+		IdCache idCache(IdCachePath);
+		nlohmann::json jsonGet;
+//
+//		for (nlohmann::json::iterator it = id1Json.begin(); it != id1Json.end(); it++) {
+//			std::string tagPath = it.key();
+//			REQUIRE(idCache.Put("id1", tagPath, it.value()));
+//		}
+//
+//		for (nlohmann::json::iterator it = id2Json.begin(); it != id2Json.end(); it++) {
+//			std::string tagPath = it.key();
+//			REQUIRE(idCache.Put("id2", tagPath, it.value()));
+//		}
+//
+//		for (nlohmann::json::iterator it = id3Json.begin(); it != id3Json.end(); it++) {
+//			std::string tagPath = it.key();
+//			REQUIRE(idCache.Put("id3", tagPath, it.value()));
+//		}
+		nlohmann::json jsonRet =idCache.GetAllKey();
+		std::cout<<"GetAllKey jsonRet" <<jsonRet<<std::endl;
+	}
+
+	SECTION("IdCache 1") {
+		nlohmann::json j;
+		j.push_back("foo");
+		j.push_back("foo2");
+		j.push_back("foo3");
+
+		Log::getLogger()->info("nlohmann/json !!!!!!!!!!!!!!!!!!!!!!! {}", j.dump());
+	}
+}

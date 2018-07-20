@@ -15,11 +15,14 @@ namespace Elastos {
 
 		IdCache::IdCache(const boost::filesystem::path &path) {
 
+			Log::getLogger()->error("ElastosID IdCache ---------- open path {}", path.string());
+
 			boost::filesystem::path parentPath = path.parent_path();
+
 			if (!parentPath.empty() && !boost::filesystem::exists(parentPath)) {
-				Log::getLogger()->warn("directory \"{}\" do not exist", parentPath.string());
+				Log::getLogger()->warn("ElastosID IdCache---------- directory parentPath \"{}\" do not exist", parentPath.string());
 				if (!boost::filesystem::create_directories(parentPath)) {
-					Log::getLogger()->error("create directory \"{}\" error", parentPath.string());
+					Log::getLogger()->error("ElastosID IdCache-------- create directory parentPath \"{}\" error", parentPath.string());
 				}
 			}
 
@@ -28,7 +31,7 @@ namespace Elastos {
 //			opt.filter_policy = NewBloomFilterPolicy(10);
 			leveldb::Status s = leveldb::DB::Open(opt, path.string(), &_db);
 			if (!s.ok()) {
-				Log::getLogger()->error("leveldb open path {} error: {}", path.string(), s.ToString());
+				Log::getLogger()->error("ElastosID leveldb open path {} error: {}", path.string(), s.ToString());
 				_db = nullptr;
 			}
 		}
@@ -45,6 +48,8 @@ namespace Elastos {
 		}
 
 		bool IdCache::Put(const std::string &id, const nlohmann::json &idJson) {
+			Log::getLogger()->error("ElastosID IdCache::Put 1  begin _db->Put id{} idJson{}", id,idJson.dump());
+
 			for (nlohmann::json::const_iterator it = idJson.begin(); it != idJson.end(); it++) {
 				if (!Put(id, it.key(), it.value())) {
 					return false;
@@ -55,6 +60,8 @@ namespace Elastos {
 		}
 
 		bool IdCache::Put(const std::string &id, const std::string &path, const nlohmann::json &pathJson) {
+			Log::getLogger()->error("ElastosID IdCache::Put 3  begin _db->Put id{} path{} idJson{}", id, path,pathJson.dump());
+
 			for (nlohmann::json::const_iterator it = pathJson.begin(); it != pathJson.end(); it++) {
 				uint32_t blockHeight = (uint32_t)std::stoi(it.key(), nullptr, 10);
 				if (!Put(id, path, blockHeight, it.value())) {
@@ -94,7 +101,10 @@ namespace Elastos {
 
 			idJson[path] = pathJson;
 
+			Log::getLogger()->error("ElastosID IdCache::Put _db->Put id{}  idJson{}", id, idJson.dump());
 			s = _db->Put(leveldb::WriteOptions(), id, idJson.dump());
+
+
 			if (!s.ok()) {
 				Log::getLogger()->error("IDCache put id={} error: {}", id, s.ToString());
 				return false;
@@ -109,20 +119,39 @@ namespace Elastos {
 			if (!Initialized()) {
 				return nlohmann::json();
 			}
+
+			//test1
+			//nlohmann::json::array_t a;
+			//nlohmann::json allkeyJson(a);
+
+			//test 2
 			nlohmann::json allkeyJson;
 			Log::getLogger()->warn("GetAllKey before _db->NewIterator");
+
+			boost::mutex::scoped_lock lock(_lockMutex);
+
 			leveldb::Iterator* it = _db->NewIterator(leveldb::ReadOptions());
-			Log::getLogger()->warn("GetAllKey before for");
+
+			//Log::getLogger()->warn("GetAllKey before for");
+			std::vector<std::string> lostrs;
+
 			for (it->SeekToFirst(); it->Valid(); it->Next()) {
 				//std::cout << it->key().ToString() << ": "  << it->value().ToString() << std::endl;
 				Log::getLogger()->warn("it->key() {}", it->key().ToString());
-				allkeyJson.push_back(it->key().ToString());
+				lostrs.push_back(it->key().ToString());
+				//allkeyJson.push_back(lostr.c_str());
 			}
-			Log::getLogger()->warn("GetAllKey before delete ");
+			//Log::getLogger()->warn("GetAllKey before delete ");
 
 			assert(it->status().ok());  // Check for any errors found during the scan
+			Log::getLogger()->warn("GetAllKey before delete it with new bee version 2");
 			delete it;
-			Log::getLogger()->warn("GetAllKey end allkeyJson ", allkeyJson.dump());
+
+			std::for_each(lostrs.begin(), lostrs.end(), [&allkeyJson](const std::string &str){
+				allkeyJson.push_back(str);
+			});
+
+			Log::getLogger()->warn("GetAllKey end allkeyJson {}", allkeyJson.dump());
 			return allkeyJson;
 		}
 
@@ -233,6 +262,8 @@ namespace Elastos {
 					return false;
 				}
 			} else {
+
+				Log::getLogger()->error("ElastosID IdCache::Delete _db->Put id{}  idJson{}", id, idJson.dump());
 				s = _db->Put(leveldb::WriteOptions(), id, idJson.dump());
 				if (!s.ok()) {
 					Log::getLogger()->error("IDCache put id={} error: {}", id, s.ToString());

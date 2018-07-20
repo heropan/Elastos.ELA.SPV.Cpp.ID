@@ -23,6 +23,7 @@
 #define IDCACHE_DIR_NAME "IdCache"
 #define IDCHAIN_NAME     "IdChain"
 #include "MasterWallet.h"
+#include <algorithm>
 
 namespace fs = boost::filesystem;
 using namespace Elastos::ElaWallet;
@@ -114,7 +115,7 @@ namespace Elastos {
 		CDidManager::CDidManager(IMasterWallet* masterWallet, const std::string &rootPath)
 			: _pathRoot(rootPath) {
 
-			Log::getLogger()->set_level(spdlog::level::info);
+			Log::getLogger()->set_level(spdlog::level::trace);
 
 			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
@@ -152,6 +153,9 @@ namespace Elastos {
 			//notice didNameStr must be store in leveldb before user setValue
 			//so path is ""  is not user data
 			_idCache->Put(didNameStr, "", defJson);
+
+			Log::getLogger()->error("ElastosID CreateDID ---------- ID str didNameStr {}", didNameStr);
+
 			return NewDid(didNameStr);
 		}
 
@@ -332,6 +336,8 @@ namespace Elastos {
 					, 10000 , "");
 				transJson = allTransJsonRet["Transactions"];
 
+				std::vector<std::string> loAllIdVec = _iidAgent->GetAllIds();
+
 				Transaction transaction;
 				for (nlohmann::json::const_iterator it = transJson.begin(); it != transJson.end(); it++) {
 					//transAction = it.value();
@@ -347,7 +353,18 @@ namespace Elastos {
 					jsonToSave.erase(payload->getPath());
 					//if id  is mine
 					//NewDid(payload->getId());
-					_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+
+
+					if(std::find(loAllIdVec.begin(),loAllIdVec.end(),payload->getId()) != loAllIdVec.end()){
+						Log::getLogger()->debug("initIdCache ------------  _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
+												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
+						_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+					}
+					else{
+
+						Log::getLogger()->debug("initIdCache !!!!!!!!!!!! shoud not be here _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
+												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
+					}
 				}
 			}
 

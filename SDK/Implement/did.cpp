@@ -174,7 +174,7 @@ namespace Elastos {
 			const std::string &message,
 			const std::string &password){
 
-			Log::getLogger()->debug("CDid::GenerateProgram  begin message{}  password{}", message, password);
+			Log::getLogger()->debug("CDid::GenerateProgram  begin lalala message{}  password{}", message, password);
 
 			nlohmann::json jsonRet = _didManger->_iidAgent->GenerateProgram(_didNameStr, message, password);
 
