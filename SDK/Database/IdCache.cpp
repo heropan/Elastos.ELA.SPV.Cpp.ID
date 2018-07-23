@@ -15,14 +15,14 @@ namespace Elastos {
 
 		IdCache::IdCache(const boost::filesystem::path &path) {
 
-			Log::getLogger()->error("ElastosID IdCache ---------- open path {}", path.string());
+			Log::getLogger()->info("ElastosID IdCache open path {}", path.string());
 
 			boost::filesystem::path parentPath = path.parent_path();
 
 			if (!parentPath.empty() && !boost::filesystem::exists(parentPath)) {
-				Log::getLogger()->warn("ElastosID IdCache---------- directory parentPath \"{}\" do not exist", parentPath.string());
+				Log::getLogger()->warn("ElastosID IdCache directory parentPath \"{}\" do not exist", parentPath.string());
 				if (!boost::filesystem::create_directories(parentPath)) {
-					Log::getLogger()->error("ElastosID IdCache-------- create directory parentPath \"{}\" error", parentPath.string());
+					Log::getLogger()->error("ElastosID IdCache create directory parentPath \"{}\" error", parentPath.string());
 				}
 			}
 
@@ -253,6 +253,11 @@ namespace Elastos {
 			}
 
 			idJson = nlohmann::json::parse(value);
+			if (idJson.empty()) {
+				Log::getLogger()->error("id={}, value={} error", id, value);
+				return false;
+			}
+
 			idJson.erase(path);
 
 			if (idJson.empty()) {
@@ -293,6 +298,11 @@ namespace Elastos {
 			idJson = nlohmann::json::parse(value);
 			if (idJson.find(path) != idJson.end()) {
 				nlohmann::json pathJson = idJson[path];
+
+				if (pathJson.empty()) {
+					Log::getLogger()->error("id = {}, path = {} not found", id, path);
+					return true;
+				}
 
 				std::ostringstream oss;
 				oss << blockHeight;

@@ -235,6 +235,25 @@ namespace Elastos {
 				_idListenerMap[id]->FireCallbacks(id, status, desc);
 		}
 
+		void CDidManager::OnBlockSyncStarted() {
+			Log::getLogger()->info("OnBlockSyncStarted...");
+		}
+
+		/**
+		 * Callback method fired when best block chain height increased. This callback could be used to show progress.
+		 * @param currentBlockHeight is the of current block when callback fired.
+		 * @param progress is current progress when block height increased.
+		 */
+		void CDidManager::OnBlockHeightIncreased(uint32_t currentBlockHeight, double progress) {
+			Log::getLogger()->info("OnBlockHeightIncreased currentBlockHeight = {}, progress = {}", progress);
+		}
+
+		/**
+		 * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
+		 */
+		void CDidManager::OnBlockSyncStopped() {
+			Log::getLogger()->info("OnBlockSyncStopped...");
+		}
 
 		void CDidManager::initSpvModule() {
 
@@ -321,7 +340,7 @@ namespace Elastos {
 			fs::path idCachePath = _pathRoot;
 			idCachePath /= IDCACHE_DIR_NAME;
 
-			_idCache =IdCachePtr(new IdCache(idCachePath));
+			_idCache = IdCachePtr(new IdCache(idCachePath));
 
 
 			ISubWallet * subWallet = GetIDSubWallet();
@@ -343,14 +362,15 @@ namespace Elastos {
 					//transAction = it.value();
 					transaction.fromJson(it.value());
 
-
 					PayloadRegisterIdentification *payload =
 						static_cast<PayloadRegisterIdentification *>(transaction.getPayload());
 					uint32_t blockHeight = transaction.getBlockHeight();
 
 					nlohmann::json jsonToSave = payload->toJson();
-					jsonToSave.erase(payload->getId());
-					jsonToSave.erase(payload->getPath());
+					if (!jsonToSave.empty()) {
+						jsonToSave.erase(payload->getId());
+						jsonToSave.erase(payload->getPath());
+					}
 					//if id  is mine
 					//NewDid(payload->getId());
 
