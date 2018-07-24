@@ -228,7 +228,8 @@ namespace Elastos {
 			Log::getLogger()->debug("CDid::GetPublicKey  begin _didNameStr{}  ",  _didNameStr);
 
 			CheckInit();
-			std::string lostrPubkey = _didManger->_masterWallet->GetPublicKey();//_didNameStr  ??????
+			std::string lostrPubkey = _didManger->_iidAgent->GetPublicKey(_didNameStr);
+			// _didManger->_masterWallet->GetPublicKey();//_didNameStr  ??????
 
 			Log::getLogger()->debug("CDid::GetPublicKey  end _didNameStr{} lostrPubkey {}"
 						  ,  _didNameStr, lostrPubkey);

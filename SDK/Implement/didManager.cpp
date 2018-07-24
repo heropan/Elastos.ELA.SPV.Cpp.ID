@@ -214,7 +214,8 @@ namespace Elastos {
 		CDidManager::OnTransactionStatusChanged(const std::string &id, const std::string &status,
 											  const nlohmann::json &desc, uint32_t blockHeight) {
 
-			Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged");
+			Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged begin id {} status {}  blockHeight {} desc {}"
+						   , id, status, blockHeight, desc.dump());
 //			std::string path = desc["Path"].get<std::string>();
 //			nlohmann::json value;
 //			if (status == "Added" || status == "Updated") {
@@ -232,7 +233,14 @@ namespace Elastos {
 //			}
 
 			if (_idListenerMap.find(id) != _idListenerMap.end())
+
+				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
+					, id, status, blockHeight);
+
 				_idListenerMap[id]->FireCallbacks(id, status, desc);
+
+			Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
+				, id, status, blockHeight);
 		}
 
 		void CDidManager::OnBlockSyncStarted() {
