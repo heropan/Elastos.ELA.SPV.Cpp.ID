@@ -192,7 +192,7 @@ namespace Elastos {
 
 			ParamChecker::checkNotEmpty(password);
 			CheckInit();
-			nlohmann::json jsonRet = _didManger->_masterWallet->Sign( message, password);//_didNameStr,
+			nlohmann::json jsonRet = _didManger->_iidAgent->Sign( _didNameStr, message, password);//_didNameStr,
 
 			Log::getLogger()->debug("CDid::GenerateProgram  end message{}  password{} jsonRet{}"
 				, message, password, jsonRet.dump());
