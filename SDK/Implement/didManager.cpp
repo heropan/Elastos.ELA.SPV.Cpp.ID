@@ -232,13 +232,13 @@ namespace Elastos {
 //				removeIdItem(id, path, blockHeight);
 //			}
 
-			if (_idListenerMap.find(id) != _idListenerMap.end())
+			if (_idListenerMap.find(id) != _idListenerMap.end()){
 
 				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
 					, id, status, blockHeight);
 
 				_idListenerMap[id]->FireCallbacks(id, status, desc);
-
+			}
 			Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
 				, id, status, blockHeight);
 		}
