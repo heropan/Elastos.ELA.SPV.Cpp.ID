@@ -37,6 +37,7 @@
 
 .idea/
 test
+cmake-*
 [dD]ebug
 *[dD]ebug
 *[rR]elease

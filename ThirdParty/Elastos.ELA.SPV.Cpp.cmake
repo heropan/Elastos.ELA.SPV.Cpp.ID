@@ -4,6 +4,7 @@
 
 set(
 	ThirdParty_SPVSDK_INC_DIR
+	${OTHER_INC_DIRS}
 	${ThirdParty_INC_DIRS}
 	${SPVCORE_INC_DIRS}
 	${SPVSDK_INC_DIRS}
