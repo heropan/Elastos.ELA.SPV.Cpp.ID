@@ -55,6 +55,22 @@ project(idchain)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
+execute_process(
+	COMMAND git describe --dirty --always --tags
+	COMMAND tr -d "\n"
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	OUTPUT_VARIABLE IDCHAIN_VERSION_MESSAGE
+)
+
+if(NOT DEFINED SPDLOG_LEVEL)
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		set(SPDLOG_LEVEL info CACHE STRING "Android ABI (architecture)" FORCE)
+	else()
+		set(SPDLOG_LEVEL debug CACHE STRING "Android ABI (architecture)" FORCE)
+	endif()
+endif()
+set_property(CACHE SPDLOG_LEVEL PROPERTY STRINGS trace debug info warning error critical off)
+
 option_with_default(IDCHAIN_BUILD_TEST_CASES "Build test cases" ON)
 option_with_default(IDCHAIN_BUILD_SAMPLE "Build sample" ON)
 
@@ -66,12 +82,23 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_definitions(-DSPDLOG_DEBUG_ON)
 endif()
 
+set(
+	IDCHAIN_OTHER_INC_DIRS
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
+	CACHE INTERNAL "config files" FORCE
+)
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/IDConfig.h.in
+	${CMAKE_CURRENT_BINARY_DIR}/IDConfig.h
+)
+
 add_subdirectory(Interface)
 add_subdirectory(SDK)
 add_subdirectory(ThirdParty)
 
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
+	${IDCHAIN_OTHER_INC_DIRS}
 	${SDK_INC_DIRS}
 	${INTERFACE_INC_DIRS}
 	${ThirdParty_INCLUDE_DIRS}
@@ -80,7 +107,7 @@ include_directories(
 add_library(
 	idchain SHARED
 	${SDK_IMPL_SOURCE_FILES}
-		SDK/Implement/did.h SDK/Implement/did.cpp Interface/ididChecker.h Interface/idid.h Interface/ididManager.h SDK/Implement/didManager.h SDK/Implement/didManager.cpp SDK/Implement/didChecker.cpp SDK/Implement/didChecker.h)
+)
 
 target_link_libraries(idchain spvsdk leveldb)
 add_dependencies(idchain spvsdk leveldb)

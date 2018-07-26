@@ -4,11 +4,14 @@
 
 #include "Interface/IdManagerFactory.h"
 #include "didManager.h"
+#include "Log.h"
+#include "IDConfig.h"
 
 namespace Elastos {
 	namespace DID {
 
 		IDIDManager* IdManagerFactory::CreateIdManager(ElaWallet::IMasterWallet* masterWallet, const std::string &rootPath) {
+			ElaWallet::Log::getLogger()->critical("libidchain.so version {}", IDCHAIN_VERSION_MESSAGE);
 			return new CDidManager(masterWallet, rootPath);
 		}
 

@@ -9,7 +9,6 @@
 #include "SDK/Common/Utils.h"
 #include "SDK/Wrapper/Key.h"
 #include "SDK/Wrapper/AddressRegisteringWallet.h"
-//#include "SDK/Implement/IdChainSubWallet.h"
 #include "SDK/Implement/MasterWallet.h"
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
@@ -17,13 +16,14 @@
 #include "SDK/Common/ParamChecker.h"
 #include "SDK/Common/Log.h"
 #include "Interface/IMasterWallet.h"
+#include "MasterWallet.h"
+#include <algorithm>
+#include "IDConfig.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
 #define PEER_CONFIG_FILE "id_PeerConnection.json"
 #define IDCACHE_DIR_NAME "IdCache"
 #define IDCHAIN_NAME     "IdChain"
-#include "MasterWallet.h"
-#include <algorithm>
 
 namespace fs = boost::filesystem;
 using namespace Elastos::ElaWallet;
@@ -115,7 +115,7 @@ namespace Elastos {
 		CDidManager::CDidManager(IMasterWallet* masterWallet, const std::string &rootPath)
 			: _pathRoot(rootPath) {
 
-			Log::getLogger()->set_level(spdlog::level::trace);
+			Log::getLogger()->set_level(spdlog::level::from_str(IDCHAIN_SPDLOG_LEVEL));
 
 			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
