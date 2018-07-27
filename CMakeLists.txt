@@ -109,8 +109,8 @@ add_library(
 	${SDK_IMPL_SOURCE_FILES}
 )
 
-target_link_libraries(idchain spvsdk leveldb)
-add_dependencies(idchain spvsdk leveldb)
+target_link_libraries(idchain ${SPVSDK_SHARED_TARGET} leveldb)
+add_dependencies(idchain ${SPVSDK_SHARED_TARGET} leveldb)
 
 if(IDCHAIN_BUILD_SAMPLE)
 	add_subdirectory(Sample)
