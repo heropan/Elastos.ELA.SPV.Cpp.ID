@@ -371,7 +371,11 @@ namespace Elastos {
 					transaction.fromJson(it.value());
 
 					PayloadRegisterIdentification *payload =
-						static_cast<PayloadRegisterIdentification *>(transaction.getPayload());
+						dynamic_cast<PayloadRegisterIdentification *>(transaction.getPayload());
+
+					if (payload == nullptr)
+						continue;
+
 					uint32_t blockHeight = transaction.getBlockHeight();
 
 					nlohmann::json jsonToSave = payload->toJson();
