@@ -6,6 +6,13 @@ add_custom_target(
 	idchain_auto_test ALL
 )
 
+add_custom_command(
+	COMMENT "Copy Data to IdTest..."
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Data
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/Elastos.ELA.SPV.Cpp/Data ${CMAKE_CURRENT_BINARY_DIR}/Data
+	)
+add_custom_target(id_copy_test_data DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Data)
+
 unset(AUTO_TEST_COMMAND)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} IDTEST_SOURCE_FILES)
@@ -13,7 +20,7 @@ foreach(src ${IDTEST_SOURCE_FILES})
 	string(REGEX REPLACE ".*/\(.*\).cpp$" "\\1" IDTEST_TARGET_NAME ${src})
 	add_executable(${IDTEST_TARGET_NAME} ${src})
 	target_link_libraries(${IDTEST_TARGET_NAME} idchain dl leveldb ${Boost_LIBRARIES})
-	add_dependencies(${IDTEST_TARGET_NAME} idchain leveldb)
+	add_dependencies(${IDTEST_TARGET_NAME} idchain leveldb id_copy_test_data)
 
 	if("${AUTO_TEST_COMMAND}" STREQUAL "")
 		set(AUTO_TEST_COMMAND ./${IDTEST_TARGET_NAME})

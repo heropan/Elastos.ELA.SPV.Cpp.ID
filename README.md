@@ -16,8 +16,7 @@ Open terminal, go to `/home/xxx/dev`
 $ cd /home/xxx/dev/
 $ git clone git@github.com:elastos/Elastos.ELA.SPV.Cpp.ID.git
 $ cd /home/xxx/dev/Elastos.ELA.SPV.Cpp.ID
-$ git submodule init
-$ git submodule update --recursive
+$ git submodule update --init --recursive
 ```
 
 ### Build Elastos.ELA.SPV.Cpp.ID
@@ -56,8 +55,7 @@ Open terminal, go to `/Users/xxx/dev`
 $ cd /Users/xxx/dev/
 $ git clone git@github.com:elastos/Elastos.ELA.SPV.Cpp.ID.git
 $ cd /Users/xxx/dev/Elastos.ELA.SPV.Cpp.ID
-$ git submodule init
-$ git submodule update --recursive
+$ git submodule update --init --recursive
 ```
 
 ### Build Elastos.ELA.SPV.Cpp.ID
