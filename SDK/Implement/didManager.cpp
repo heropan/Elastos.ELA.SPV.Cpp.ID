@@ -117,7 +117,7 @@ namespace Elastos {
 
 			Log::getLogger()->set_level(spdlog::level::from_str(IDCHAIN_SPDLOG_LEVEL));
 
-			Log::getLogger()->info("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
+			Log::getLogger()->trace("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
 			ParamChecker::checkNullPointer(masterWallet);
 
@@ -212,11 +212,11 @@ namespace Elastos {
 		}
 
 		void
-		CDidManager::OnTransactionStatusChanged(const std::string &id, const std::string &status,
+		CDidManager::OnTransactionStatusChanged(const std::string &txID, const std::string &status,
 											  const nlohmann::json &desc, uint32_t blockHeight) {
 
 			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged begin id {} status {}  blockHeight {} desc {}"
-						   , id, status, blockHeight, desc.dump());
+						   , txID, status, blockHeight, desc.dump());
 //			std::string path = desc["Path"].get<std::string>();
 //			nlohmann::json value;
 //			if (status == "Added" || status == "Updated") {
@@ -232,16 +232,17 @@ namespace Elastos {
 //
 //				removeIdItem(id, path, blockHeight);
 //			}
-
+			std::string id = desc["Id"].get<std::string>();
+			std::string path = desc["Path"].get<std::string>();
 			if (_idListenerMap.find(id) != _idListenerMap.end()){
 
-				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
-					, id, status, blockHeight);
+				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged find(id) ok id {} path {}  blockHeight {} "
+					, id, path, blockHeight);
 
-				_idListenerMap[id]->FireCallbacks(id, status, desc);
+				_idListenerMap[id]->FireCallbacks(id, path, desc);
 			}
-			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged end id {} status {}  blockHeight {} "
-				, id, status, blockHeight);
+			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged end id {} path {}  blockHeight {} "
+				, id, path, blockHeight);
 		}
 
 		void CDidManager::OnBlockSyncStarted() {

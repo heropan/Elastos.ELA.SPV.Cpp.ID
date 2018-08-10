@@ -44,7 +44,7 @@ namespace Elastos {
 			virtual bool  UnregisterCallback(const std::string &id);
 
 			virtual void OnTransactionStatusChanged(
-				const std::string &id,
+				const std::string &txID,
 				const std::string &status,
 				const nlohmann::json &desc,
 				uint32_t blockHeight);
