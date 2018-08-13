@@ -233,13 +233,13 @@ namespace Elastos {
 //				removeIdItem(id, path, blockHeight);
 //			}
 			std::string id = desc["Id"].get<std::string>();
-			std::string path = desc["Path"].get<std::string>();
+			std::string path = "";//desc["Path"].get<std::string>();
 			if (_idListenerMap.find(id) != _idListenerMap.end()){
 
 				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged find(id) ok id {} path {}  blockHeight {} "
 					, id, path, blockHeight);
 
-				_idListenerMap[id]->FireCallbacks(id, path, desc);
+				_idListenerMap[id]->FireCallbacks(id, status, desc);
 			}
 			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged end id {} path {}  blockHeight {} "
 				, id, path, blockHeight);
@@ -370,39 +370,37 @@ namespace Elastos {
 
 				std::vector<std::string> loAllIdVec = _iidAgent->GetAllIds();
 
-				Transaction transaction;
-				for (nlohmann::json::const_iterator it = transJson.begin(); it != transJson.end(); it++) {
-					//transAction = it.value();
-					transaction.fromJson(it.value());
-
-					PayloadRegisterIdentification *payload =
-						dynamic_cast<PayloadRegisterIdentification *>(transaction.getPayload());
-
-					if (payload == nullptr)
-						continue;
-
-					uint32_t blockHeight = transaction.getBlockHeight();
-
-					nlohmann::json jsonToSave = payload->toJson();
-					if (!jsonToSave.empty()) {
-						jsonToSave.erase(payload->getId());
-						jsonToSave.erase(payload->getPath());
-					}
-					//if id  is mine
-					//NewDid(payload->getId());
-
-
-					if(std::find(loAllIdVec.begin(),loAllIdVec.end(),payload->getId()) != loAllIdVec.end()){
-						Log::getLogger()->info("initIdCache ------------  _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
-												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
-						_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
-					}
-					else{
-
-						Log::getLogger()->info("initIdCache !!!!!!!!!!!! shoud not be here _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
-												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
-					}
-				}
+//				Transaction transaction;
+//				for (nlohmann::json::const_iterator it = transJson.begin(); it != transJson.end(); it++) {
+//					//transAction = it.value();
+//					transaction.fromJson(it.value());
+//
+//					PayloadRegisterIdentification *payload =
+//						dynamic_cast<PayloadRegisterIdentification *>(transaction.getPayload());
+//
+//					if (payload == nullptr)
+//						continue;
+//
+//					uint32_t blockHeight = transaction.getBlockHeight();
+//
+//					nlohmann::json jsonToSave = payload->toJson();
+//					if (!jsonToSave.empty()) {
+//						jsonToSave.erase(payload->getId());
+//						jsonToSave.erase(payload->getPath());
+//					}
+//
+//
+//					if(std::find(loAllIdVec.begin(),loAllIdVec.end(),payload->getId()) != loAllIdVec.end()){
+//						Log::getLogger()->info("initIdCache ------------  _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
+//												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
+//						_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
+//					}
+//					else{
+//
+//						Log::getLogger()->info("initIdCache !!!!!!!!!!!! shoud not be here _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
+//												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
+//					}
+//				}
 			}
 
 			nlohmann::json jsonRet = _idCache->GetAllKey();
