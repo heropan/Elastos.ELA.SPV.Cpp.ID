@@ -34,69 +34,6 @@ namespace Elastos {
 	namespace DID {
 
 
-
-		//ISubWalletCallback
-		class SpvListener : public Wallet::Listener{
-		public:
-			SpvListener(CDidManager *manager) : _manager(manager) {
-			}
-
-			virtual void balanceChanged(uint64_t balance) {
-
-			}
-
-			virtual void onTxAdded(const TransactionPtr &transaction) {
-
-//				if (transaction->getTransactionType() != ELATransaction::RegisterIdentification)
-//					return;
-//
-//				fireTransactionStatusChanged(
-//					static_cast<PayloadRegisterIdentification *>(transaction->getPayload().get()),
-//					SubWalletCallback::Added, transaction->getBlockHeight());
-			}
-
-			virtual void onTxUpdated(const std::string &hash, uint32_t blockHeight, uint32_t timeStamp) {
-//				BRTransaction *transaction = BRWalletTransactionForHash(
-//					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
-//				if (transaction == nullptr ||
-//					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
-//					return;
-//
-//				Transaction wrapperTx((ELATransaction *)transaction);
-//				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
-//					wrapperTx.getPayload().get());
-//				fireTransactionStatusChanged(payload, SubWalletCallback::Updated, blockHeight);
-			}
-
-			virtual void onTxDeleted(const std::string &hash, bool notifyUser, bool recommendRescan) {
-//				BRTransaction *transaction = BRWalletTransactionForHash(
-//					_manager->_walletManager->getWallet()->getRaw(), Utils::UInt256FromString(hash));
-//				if (transaction == nullptr ||
-//					((ELATransaction *) transaction)->type != ELATransaction::RegisterIdentification)
-//					return;
-//
-//				Transaction wrapperTx((ELATransaction *)transaction);
-//				PayloadRegisterIdentification *payload = static_cast<PayloadRegisterIdentification *>(
-//					wrapperTx.getPayload().get());
-//				fireTransactionStatusChanged(payload, SubWalletCallback::Deleted, transaction->blockHeight);
-			}
-
-
-
-		private:
-			void fireTransactionStatusChanged(PayloadRegisterIdentification *payload,
-											  SubWalletCallback::TransactionStatus status, uint32_t blockHeight) {
-				nlohmann::json j = payload->toJson();
-				if (j.find("ID") == j.end())
-					return;
-
-				_manager->OnTransactionStatusChanged(j["ID"].get<std::string>(), SubWalletCallback::convertToString(
-					status), j, blockHeight);
-			}
-
-			CDidManager *_manager;
-		};
-
 		CDidManager::~CDidManager() {
 
 			DidMap::iterator itor ;
@@ -183,7 +120,7 @@ namespace Elastos {
 			return _idCache->GetAllKey();
 		}
 
-		void  CDidManager::DestoryDID(const std::string &didName){
+		void CDidManager::DestoryDID(const std::string &didName){
 
 			Log::getLogger()->info("DestoryDID didName {} begin",  didName);
 			DidMap::iterator itor ;
@@ -263,6 +200,11 @@ namespace Elastos {
 		 */
 		void CDidManager::OnBlockSyncStopped() {
 			Log::getLogger()->info("OnBlockSyncStopped...");
+		}
+
+		void CDidManager::OnDestroyWallet() {
+			Log::getLogger()->info("OnDestroyWallet...");
+			_idCache->DeleteAll();
 		}
 
 		void CDidManager::initSpvModule() {

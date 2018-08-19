@@ -65,6 +65,8 @@ namespace Elastos {
 			 * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
 			 */
 			virtual void OnBlockSyncStopped();
+
+			virtual void OnDestroyWallet();
 		protected:
 			friend class SpvListener;
 
@@ -133,8 +135,6 @@ namespace Elastos {
 
 			//typedef boost::shared_ptr<ElaWallet::WalletManager> WalletManagerPtr;
 
-			typedef boost::shared_ptr<SpvListener> SpvListenerPtr;
-
 			typedef boost::shared_ptr<IdCache> IdCachePtr;
 			friend class CDid;
 			DidMap	_didMap;
@@ -145,7 +145,6 @@ namespace Elastos {
 
 			//WalletManagerPtr _walletManager;
 
-			SpvListenerPtr _spvListener;
 			std::string _pathRoot;
 			IdCachePtr _idCache;
 
