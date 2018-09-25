@@ -40,6 +40,8 @@ namespace Elastos {
 
 			virtual void  DestoryDID(const std::string &didName);
 
+			virtual void ClearLocal();
+
 			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
 			virtual bool  UnregisterCallback(const std::string &id);
 
@@ -66,7 +68,6 @@ namespace Elastos {
 			 */
 			virtual void OnBlockSyncStopped();
 
-			virtual void OnDestroyWallet();
 		protected:
 			friend class SpvListener;
 

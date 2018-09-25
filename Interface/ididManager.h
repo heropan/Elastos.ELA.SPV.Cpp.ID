@@ -14,7 +14,7 @@
 namespace Elastos {
 	namespace DID {
 		//class IIdManagerCallback;
-		class IDIDManager{
+		class IDIDManager {
 		public:
 
 			virtual IDID * CreateDID(const std::string &password) = 0;
@@ -24,6 +24,8 @@ namespace Elastos {
 			virtual nlohmann::json GetDIDList() const = 0;
 
 			virtual void  DestoryDID(const std::string &didName) = 0;
+
+			virtual void ClearLocal() = 0;
 
 			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback)= 0;
 

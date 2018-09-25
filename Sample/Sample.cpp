@@ -7,7 +7,7 @@
 //#include "IdManager.h"
 #include "leveldb/db.h"
 #include "Interface/IMasterWallet.h"
-#include "Interface/IdManagerFactory.h"
+#include "Interface/DIDManagerSupervisor.h"
 
 #include "MasterWalletManager.h"
 #include "Interface/ididManager.h"
@@ -84,12 +84,12 @@ int main(int argc, char *argv[]) {
 	//Enviroment::InitializeRootPath("Data");
 	//initMasterWallet();
 	//DestroyMasterWallet();
-	IdManagerFactory idManagerFactory;
+	DIDManagerSupervisor didManagerSupervisor("Data");
 
 	initMasterWallet();
 
 
-	IDIDManager *idManager = idManagerFactory.CreateIdManager(masterWallet, "Data");
+	IDIDManager *idManager = didManagerSupervisor.CreateDIDManager(masterWallet, "Data");
 	std::string id = registerId(idManager);
 	//std::cout << "Id address: " << id << std::endl;
 

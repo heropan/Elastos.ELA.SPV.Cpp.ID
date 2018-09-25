@@ -8,7 +8,6 @@
 #include "Core/BRTransaction.h"
 #include "SDK/Common/Utils.h"
 #include "SDK/Wrapper/Key.h"
-#include "SDK/Wrapper/AddressRegisteringWallet.h"
 #include "SDK/Implement/MasterWallet.h"
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
@@ -137,7 +136,9 @@ namespace Elastos {
 
 		}
 
-
+		void CDidManager::ClearLocal() {
+			_idCache->DeleteAll();
+		}
 
 		nlohmann::json CDidManager::GetLastIdValue(const std::string &id, const std::string &path)  {
 			ParamChecker::checkNotEmpty(id);
@@ -200,11 +201,6 @@ namespace Elastos {
 		 */
 		void CDidManager::OnBlockSyncStopped() {
 			Log::getLogger()->info("OnBlockSyncStopped...");
-		}
-
-		void CDidManager::OnDestroyWallet() {
-			Log::getLogger()->info("OnDestroyWallet...");
-			_idCache->DeleteAll();
 		}
 
 		void CDidManager::initSpvModule() {
