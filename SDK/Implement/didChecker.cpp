@@ -3,10 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 
+#include <SDK/Common/ErrorChecker.h>
 #include "didChecker.h"
-
-#include <SDK/Common/ParamChecker.h>
-//#include "didManager.h"
 
 using namespace Elastos::ElaWallet;
 
@@ -15,7 +13,7 @@ namespace Elastos {
 
 		didChecker::didChecker(CDidManager* didManager) {
 
-			ParamChecker::checkNullPointer(didManager);
+			ErrorChecker::condition(didManager == nullptr, Error::InvalidArgument, "DID manager is null");
 			_pDidManager = didManager;
 		}
 
@@ -27,39 +25,34 @@ namespace Elastos {
 			const std::string &did,
 			const std::string &keyPath) {
 
-			ParamChecker::checkNullPointer(_pDidManager);
-			ParamChecker::checkNotEmpty(did);
-			ParamChecker::checkNotEmpty(keyPath);
+			ErrorChecker::argumentNotEmpty(did, "DID");
+			ErrorChecker::argumentNotEmpty(keyPath, "Key path");
 
 
-			IDID * idid = _pDidManager->GetDID(did);
-			ParamChecker::checkNullPointer(idid);
-			return  idid->GetValue(keyPath);
+			IDID *idid = _pDidManager->GetDID(did);
+			ErrorChecker::condition(idid == nullptr, Error::DIDNotFound, "DID not found");
+			return idid->GetValue(keyPath);
 		}
 
 		nlohmann::json didChecker::GetHistoryValue(
 			const std::string &did,
 			const std::string &keyPath){
 
-			ParamChecker::checkNullPointer(_pDidManager);
-			ParamChecker::checkNotEmpty(did);
-			ParamChecker::checkNotEmpty(keyPath);
-
+			ErrorChecker::argumentNotEmpty(did, "DID");
+			ErrorChecker::argumentNotEmpty(keyPath, "Key path");
 
 			IDID * idid = _pDidManager->GetDID(did);
-			ParamChecker::checkNullPointer(idid);
+			ErrorChecker::condition(idid == nullptr, Error::DIDNotFound, "DID not found");
+
 			return  idid->GetHistoryValue(keyPath);
 		}
 
-		nlohmann::json didChecker::GetAllKeys(
-			const std::string &did,
-			uint32_t start,
-			uint32_t count){
-			ParamChecker::checkNullPointer(_pDidManager);
-			ParamChecker::checkNotEmpty(did);
+		nlohmann::json didChecker::GetAllKeys(const std::string &did, uint32_t start, uint32_t count) {
+			ErrorChecker::argumentNotEmpty(did, "DID");
 
 			IDID * idid = _pDidManager->GetDID(did);
-			ParamChecker::checkNullPointer(idid);
+			ErrorChecker::condition(idid == nullptr, Error::DIDNotFound, "DID not found");
+
 			return  idid->GetAllKeys(start, count);
 		}
 
@@ -67,25 +60,24 @@ namespace Elastos {
 			const std::string &did,
 			const std::string &publicKey,
 			const std::string &message,
-			const std::string &signature){
+			const std::string &signature) {
 
-			ParamChecker::checkNullPointer(_pDidManager);
-			ParamChecker::checkNotEmpty(did);
-			ParamChecker::checkNotEmpty(publicKey);
-			ParamChecker::checkNotEmpty(message);
+			ErrorChecker::argumentNotEmpty(did, "DID");
+			ErrorChecker::argumentNotEmpty(publicKey, "Pubkey");
+			ErrorChecker::argumentNotEmpty(message, "Message");
 
 
 			IDID * idid = _pDidManager->GetDID(did);
-			ParamChecker::checkNullPointer(idid);
+			ErrorChecker::condition(idid == nullptr, Error::DIDNotFound, "DID not found");
 
 			//check did and publicKey???????????
 			return  idid->CheckSign(message, signature);
 		}
 
 		std::string didChecker::GetPublicKey(const std::string &did) {
-			ParamChecker::checkNotEmpty(did);
+			ErrorChecker::argumentNotEmpty(did, "DID");
 			IDID * idid = _pDidManager->GetDID(did);
-			ParamChecker::checkNullPointer(idid);
+			ErrorChecker::condition(idid == nullptr, Error::DIDNotFound, "DID not found");
 
 			return idid->GetPublicKey();
 		}
@@ -95,7 +87,7 @@ namespace Elastos {
 			const std::string &nonce ,
 			const std::string &appid ,
 			const std::string &declaration,
-			const std::string &password){
+			const std::string &password) {
 //
 //			//首先检查DID是否存在
 //			ParamChecker::checkNotEmpty(did);

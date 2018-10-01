@@ -12,11 +12,11 @@
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
 #include "SDK/ELACoreExt/ELATransaction.h"
-#include "SDK/Common/ParamChecker.h"
 #include "SDK/Common/Log.h"
 #include "Interface/IMasterWallet.h"
 #include "MasterWallet.h"
 #include <algorithm>
+#include <SDK/Common/ErrorChecker.h>
 #include "IDConfig.h"
 
 #define SPV_DB_FILE_NAME "spv.db"
@@ -55,13 +55,13 @@ namespace Elastos {
 
 			Log::getLogger()->trace("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
-			ParamChecker::checkNullPointer(masterWallet);
+			ErrorChecker::condition(masterWallet == nullptr, Error::InvalidArgument, "Master wallet is null");
 
 			_masterWallet = masterWallet;//(Elastos::ElaWallet::MasterWallet*)
 			//_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
 			Elastos::ElaWallet::MasterWallet* pMasterWallet = (Elastos::ElaWallet::MasterWallet*)_masterWallet;
 			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(pMasterWallet);
-			ParamChecker::checkNullPointer(_iidAgent);
+			ErrorChecker::condition(_iidAgent == nullptr, Error::InvalidArgument, "Master wallet is not instance of ID agent");
 			initSpvModule();
 			initIdCache();
 			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} end", rootPath.c_str());
@@ -72,7 +72,7 @@ namespace Elastos {
 			Log::getLogger()->info("CDidManager::CreateDID password = {} begin", password);
 			//Log::getLogger()->error("2222CDidManager::CreateDID password = {} begin", password);
 
-			ParamChecker::checkPassword(password);
+			ErrorChecker::checkPassword(password, "ID");
 
 			std::vector<std::string> allIdsVec = _iidAgent->GetAllIds();
 
@@ -141,8 +141,8 @@ namespace Elastos {
 		}
 
 		nlohmann::json CDidManager::GetLastIdValue(const std::string &id, const std::string &path)  {
-			ParamChecker::checkNotEmpty(id);
-			ParamChecker::checkNotEmpty(path);
+			ErrorChecker::argumentNotEmpty(id, "ID");
+			ErrorChecker::argumentNotEmpty(path, "Path");
 
 			CDid * idID  = (CDid *)GetDID(id);
 			return idID->GetValue(path);
@@ -242,16 +242,16 @@ namespace Elastos {
 			//todo parse proof, data hash, sign from value
 
 
-			ParamChecker::checkNotEmpty(id);
-			ParamChecker::checkNotEmpty(path);
+			ErrorChecker::argumentNotEmpty(id, "ID");
+			ErrorChecker::argumentNotEmpty(path, "Path");
 
 			CDid * idID  = (CDid *)GetDID(id);
 			return idID->setValue(path, value, blockHeight);
 		}
 
 		void CDidManager::removeIdItem(const std::string &id, const std::string &path, uint32_t blockHeight) {
-			ParamChecker::checkNotEmpty(id);
-			ParamChecker::checkNotEmpty(path);
+			ErrorChecker::argumentNotEmpty(id, "ID");
+			ErrorChecker::argumentNotEmpty(path, "Path");
 
 			CDid * idID  = (CDid *)GetDID(id);
 			idID->DelValue(path, blockHeight);

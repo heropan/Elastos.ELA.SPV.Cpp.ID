@@ -4,7 +4,7 @@
 #include "did.h"
 
 #include <boost/filesystem.hpp>
-#include <SDK/Common/ParamChecker.h>
+#include <SDK/Common/ErrorChecker.h>
 #include "didManager.h"
 #include "SDK/Common/Log.h"
 #include "SDK/Wrapper/Key.h"
@@ -12,14 +12,15 @@
 namespace fs = boost::filesystem;
 
 using namespace Elastos::ElaWallet;
+
 namespace Elastos {
 	namespace DID {
 
 		CDid::CDid(CDidManager* didManager, const std::string &id) {
 
 			Log::getLogger()->info("CDid::CDid  begin didNameStr didManager {:p} id{} ", (void*) didManager, id);
-			ParamChecker::checkNullPointer(didManager);
-			ParamChecker::checkNotEmpty(id);
+			ErrorChecker::condition(didManager == nullptr, Error::InvalidArgument, "DID manager is null");
+			ErrorChecker::argumentNotEmpty(id, "ID");
 
 			_didManger = didManager;
 			_didNameStr = id;
@@ -36,7 +37,6 @@ namespace Elastos {
 		}
 
 		void CDid::CheckInit() const {
-			ParamChecker::checkNotEmpty(_didNameStr);
 			//ParamChecker::checkNotEmpty(_passWord);
 		}
 
@@ -47,8 +47,7 @@ namespace Elastos {
 			Log::getLogger()->info("CDid::DelValue  begin path{}  blockHeight{}", path, blockHeight);
 
 			CheckInit();
-			ParamChecker::checkNotEmpty(path);
-
+			ErrorChecker::argumentNotEmpty(path, "Path " + path);
 
 			_didManger->_idCache->Delete(_didNameStr, path, blockHeight);
 
@@ -62,7 +61,7 @@ namespace Elastos {
 					  uint32_t blockHeight){
 
 			CheckInit();
-			ParamChecker::checkNotEmpty(path);
+			ErrorChecker::argumentNotEmpty(path, "Path " + path);
 
 			Log::getLogger()->info("CDid::SetValue begin  path{}  value{} blockHeight{}", path, value.dump(), blockHeight);
 
@@ -78,7 +77,7 @@ namespace Elastos {
 			Log::getLogger()->info("CDid::SetValue begin  keyPath{}  valueJson{}", keyPath, valueJson.dump());
 
 			CheckInit();
-			ParamChecker::checkNotEmpty(keyPath);
+			ErrorChecker::argumentNotEmpty(keyPath, "Key path " + keyPath);
 			//检查是否json ???
 
 
@@ -91,7 +90,7 @@ namespace Elastos {
 
 			Log::getLogger()->info("CDid::GetValue  begin path{} ", path);
 			CheckInit();
-			ParamChecker::checkNotEmpty(path);
+			ErrorChecker::argumentNotEmpty(path, "Path " + path);
 
 			nlohmann::json jsonGet;
 			jsonGet =_didManger-> _idCache->Get(_didNameStr, path);
@@ -120,7 +119,7 @@ namespace Elastos {
 
 			Log::getLogger()->info("CDid::GetHistoryValue begin  keyPath{} ", keyPath);
 			CheckInit();
-			ParamChecker::checkNotEmpty(keyPath);
+			ErrorChecker::argumentNotEmpty(keyPath, "Key path " + keyPath);
 
 			nlohmann::json jsonRet = _didManger->_idCache->Get(_didNameStr, keyPath);
 
@@ -190,7 +189,7 @@ namespace Elastos {
 
 			Log::getLogger()->info("CDid::Sign  begin message{}  password{}", message, password);
 
-			ParamChecker::checkNotEmpty(password);
+			ErrorChecker::argumentNotEmpty(password, "Password");
 			CheckInit();
 			nlohmann::json jsonRet = _didManger->_iidAgent->Sign( _didNameStr, message, password);//_didNameStr,
 
