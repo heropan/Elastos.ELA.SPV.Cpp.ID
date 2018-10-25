@@ -12,7 +12,7 @@
 #include "SDK/Implement/SubWalletCallback.h"
 #include "SDK/ELACoreExt/Payload/PayloadRegisterIdentification.h"
 #include "SDK/ELACoreExt/ELATransaction.h"
-#include "SDK/Common/Log.h"
+#include "Common/DIDLog.h"
 #include "Interface/IMasterWallet.h"
 #include "MasterWallet.h"
 #include <algorithm>
@@ -38,6 +38,12 @@ namespace Elastos {
 			DidMap::iterator itor ;
 			CDid* did = NULL;
 
+			for (DIDSubWalletCallbackMap::iterator it = _didSubWalletCallbacks.begin(); it != _didSubWalletCallbacks.end(); ++it) {
+				if (it->second != nullptr) {
+					delete it->second;
+				}
+			}
+
 			for (itor = _didMap.begin(); itor !=  _didMap.end(); ) {
 
 				did = (CDid*)itor->second;
@@ -51,26 +57,41 @@ namespace Elastos {
 		CDidManager::CDidManager(IMasterWallet* masterWallet, const std::string &rootPath)
 			: _pathRoot(rootPath) {
 
-			Log::getLogger()->set_level(spdlog::level::from_str(IDCHAIN_SPDLOG_LEVEL));
-
-			Log::getLogger()->trace("CDidManager::CDidManager rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
+			DIDLog::debug("rootPath = {} masterWallet ={:p} begin", rootPath, (void*)masterWallet);
 
 			ErrorChecker::condition(masterWallet == nullptr, Error::InvalidArgument, "Master wallet is null");
 
-			_masterWallet = masterWallet;//(Elastos::ElaWallet::MasterWallet*)
+			_masterWallet = masterWallet;
+
+			RegisterDIDSubWalletCallback();
+
 			//_iidAgent     = (Elastos::ElaWallet::IIdAgent*)masterWallet;
 			Elastos::ElaWallet::MasterWallet* pMasterWallet = (Elastos::ElaWallet::MasterWallet*)_masterWallet;
 			_iidAgent     = dynamic_cast<Elastos::ElaWallet::IIdAgent*>(pMasterWallet);
 			ErrorChecker::condition(_iidAgent == nullptr, Error::InvalidArgument, "Master wallet is not instance of ID agent");
-			initSpvModule();
 			initIdCache();
-			Log::getLogger()->debug("CDidManager::CDidManager rootPath = {} end", rootPath.c_str());
+			DIDLog::debug("CDidManager::CDidManager rootPath = {} end", rootPath.c_str());
+		}
+
+		void CDidManager::RegisterDIDSubWalletCallback() {
+			std::vector<ISubWallet *> subWallets = _masterWallet->GetAllSubWallets();
+
+			for (int i = 0; i < subWallets.size(); ++i) {
+				if (subWallets[i]->GetChainId() == IDCHAIN_NAME){
+					if (_didSubWalletCallbacks.find(_masterWallet->GetId()) == _didSubWalletCallbacks.end()) {
+						DIDSubWalletCallback *callback = new DIDSubWalletCallback(this);
+						_didSubWalletCallbacks[_masterWallet->GetId()] = callback;
+						subWallets[i]->AddCallback(callback);
+						break;
+					}
+				}
+			}
 		}
 
 		IDID * CDidManager::CreateDID(const std::string &password){
 
-			Log::getLogger()->info("CDidManager::CreateDID password = {} begin", password);
-			//Log::getLogger()->error("2222CDidManager::CreateDID password = {} begin", password);
+			DIDLog::info("CDidManager::CreateDID password = {} begin", password);
+			//DIDLog::error("2222CDidManager::CreateDID password = {} begin", password);
 
 			ErrorChecker::checkPassword(password, "ID");
 
@@ -91,7 +112,7 @@ namespace Elastos {
 			//so path is ""  is not user data
 			_idCache->Put(didNameStr, "", defJson);
 
-			Log::getLogger()->error("ElastosID CreateDID ---------- ID str didNameStr {}", didNameStr);
+			DIDLog::error("ElastosID CreateDID ---------- ID str didNameStr {}", didNameStr);
 
 			return NewDid(didNameStr);
 		}
@@ -114,14 +135,14 @@ namespace Elastos {
 //				didJson.push_back(itor->first);
 //			}
 //			return didJson ;
-			Log::getLogger()->debug("GetDIDList begin");
+			DIDLog::debug("GetDIDList begin");
 
 			return _idCache->GetAllKey();
 		}
 
 		void CDidManager::DestoryDID(const std::string &didName){
 
-			Log::getLogger()->info("DestoryDID didName {} begin",  didName);
+			DIDLog::info("DestoryDID didName {} begin",  didName);
 			DidMap::iterator itor ;
 			itor = _didMap.find(didName);
 			if (itor == _didMap.end())
@@ -132,7 +153,7 @@ namespace Elastos {
 			delete idID;
 
 			_idCache->Delete(didName);
-			Log::getLogger()->info("DestoryDID didName {} end",  didName);
+			DIDLog::info("DestoryDID didName {} end",  didName);
 
 		}
 
@@ -147,93 +168,6 @@ namespace Elastos {
 			CDid * idID  = (CDid *)GetDID(id);
 			return idID->GetValue(path);
 
-		}
-
-		void
-		CDidManager::OnTransactionStatusChanged(const std::string &txID, const std::string &status,
-											  const nlohmann::json &desc, uint32_t blockHeight) {
-
-			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged begin id {} status {}  blockHeight {} desc {}"
-						   , txID, status, blockHeight, desc.dump());
-//			std::string path = desc["Path"].get<std::string>();
-//			nlohmann::json value;
-//			if (status == "Added" || status == "Updated") {
-//				value.push_back(desc["DataHash"]);
-//				value.push_back(desc["Proof"]);
-//				value.push_back(desc["Sign"]);
-//				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged before updateDatabase");
-//				updateDatabase(id, path, value, blockHeight);
-//			} else if (status == "Deleted") {
-//				value = GetLastIdValue(id, path);
-//
-//				Log::getLogger()->debug("CDidManager::OnTransactionStatusChanged before removeIdItem");
-//
-//				removeIdItem(id, path, blockHeight);
-//			}
-			std::string id = desc["Id"].get<std::string>();
-			std::string path = "";//desc["Path"].get<std::string>();
-			if (_idListenerMap.find(id) != _idListenerMap.end()){
-
-				Log::getLogger()->info("CDidManager::OnTransactionStatusChanged find(id) ok id {} path {}  blockHeight {} "
-					, id, path, blockHeight);
-
-				_idListenerMap[id]->FireCallbacks(id, status, desc);
-			}
-			Log::getLogger()->info("CDidManager::OnTransactionStatusChanged end id {} path {}  blockHeight {} "
-				, id, path, blockHeight);
-		}
-
-		void CDidManager::OnBlockSyncStarted() {
-			Log::getLogger()->info("OnBlockSyncStarted...");
-		}
-
-		/**
-		 * Callback method fired when best block chain height increased. This callback could be used to show progress.
-		 * @param currentBlockHeight is the of current block when callback fired.
-		 * @param progress is current progress when block height increased.
-		 */
-		void CDidManager::OnBlockHeightIncreased(uint32_t currentBlockHeight, double progress) {
-			Log::getLogger()->info("OnBlockHeightIncreased currentBlockHeight = {}, progress = {}", progress);
-		}
-
-		/**
-		 * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
-		 */
-		void CDidManager::OnBlockSyncStopped() {
-			Log::getLogger()->info("OnBlockSyncStopped...");
-		}
-
-		void CDidManager::initSpvModule() {
-
-//			fs::path dbPath = _pathRoot;
-//			dbPath /= SPV_DB_FILE_NAME;
-//			fs::path peerConfigPath = _pathRoot;
-//			peerConfigPath /= PEER_CONFIG_FILE;
-//			////
-//			static nlohmann::json ElaPeerConfig =
-//				R"(
-//						  {
-//							"MagicNumber": 7630401,
-//							"KnowingPeers":
-//							[
-//								{
-//									"Address": "127.0.0.1",
-//									"Port": 20866,
-//									"Timestamp": 0,
-//									"Services": 1,
-//									"Flags": 0
-//								}
-//							]
-//						}
-//					)"_json;
-			///
-			//WalletManager future use
-//			std::vector<std::string>  initialAddresses;
-//			_walletManager = WalletManagerPtr(
-//				new WalletManager(dbPath, ElaPeerConfig, 0, 0, initialAddresses, ChainParams::mainNet()));
-//
-			//_walletManager->registerWalletListener(_spvListener.get());
-			//_masterWallet->
 		}
 
 		void CDidManager::updateDatabase(const std::string &id, const std::string &path, const nlohmann::json &value,
@@ -259,7 +193,7 @@ namespace Elastos {
 		}
 
 		ISubWallet * CDidManager::GetIDSubWallet(){
-			Log::getLogger()->info("GetIDSubWallet  begin");
+			DIDLog::info("GetIDSubWallet  begin");
 
 			std::vector<ISubWallet *> subWalletVec;
 			subWalletVec = _masterWallet->GetAllSubWallets();
@@ -272,15 +206,15 @@ namespace Elastos {
 				}
 				subWallet = NULL;
 			}
-			Log::getLogger()->info("GetIDSubWallet subWallet int: {:p} end", ( void* )subWallet);//{0:x}
+			DIDLog::info("GetIDSubWallet subWallet int: {:p} end", ( void* )subWallet);//{0:x}
 			return subWallet;
 		}
 
 		bool CDidManager::initIdCache() {
 
-			Log::getLogger()->info("initIdCache  begin");
+			DIDLog::info("initIdCache  begin");
 			if (_idCache != NULL){
-				Log::getLogger()->debug("initIdCache  _idCache != NULL end");
+				DIDLog::debug("initIdCache  _idCache != NULL end");
 				return false;
 			}
 
@@ -290,72 +224,18 @@ namespace Elastos {
 
 			_idCache = IdCachePtr(new IdCache(idCachePath));
 
-
-			ISubWallet * subWallet = GetIDSubWallet();
-			if (subWallet){
-				//新加
-				ISubWalletCallback *subCallback = dynamic_cast<ISubWalletCallback *>(this);
-				//注册回调
-				subWallet->AddCallback(subCallback);
-				Log::getLogger()->debug("initIdCache  AddCallback {:p}", ( void* )subCallback);
-
-
-
-				nlohmann::json transJson;
-				nlohmann::json allTransJsonRet = subWallet->GetAllTransaction(0
-					, 10000 , "");
-				transJson = allTransJsonRet["Transactions"];
-
-				std::vector<std::string> loAllIdVec = _iidAgent->GetAllIds();
-
-//				Transaction transaction;
-//				for (nlohmann::json::const_iterator it = transJson.begin(); it != transJson.end(); it++) {
-//					//transAction = it.value();
-//					transaction.fromJson(it.value());
-//
-//					PayloadRegisterIdentification *payload =
-//						dynamic_cast<PayloadRegisterIdentification *>(transaction.getPayload());
-//
-//					if (payload == nullptr)
-//						continue;
-//
-//					uint32_t blockHeight = transaction.getBlockHeight();
-//
-//					nlohmann::json jsonToSave = payload->toJson();
-//					if (!jsonToSave.empty()) {
-//						jsonToSave.erase(payload->getId());
-//						jsonToSave.erase(payload->getPath());
-//					}
-//
-//
-//					if(std::find(loAllIdVec.begin(),loAllIdVec.end(),payload->getId()) != loAllIdVec.end()){
-//						Log::getLogger()->info("initIdCache ------------  _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
-//												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
-//						_idCache->Put(payload->getId(), payload->getPath(), blockHeight, jsonToSave);
-//					}
-//					else{
-//
-//						Log::getLogger()->info("initIdCache !!!!!!!!!!!! shoud not be here _idCache->Put id {} path {} blockHeight {} jsonToSave {}",
-//												payload->getId(), payload->getPath(), blockHeight, jsonToSave.dump());
-//					}
-//				}
-			}
-
 			nlohmann::json jsonRet = _idCache->GetAllKey();
 
-			//std::cout << "jsonRet "<< jsonRet <<std::endl;
-
 			for (nlohmann::json::const_iterator it = jsonRet.begin(); it != jsonRet.end(); it++) {
-				//std::cout << "value "<< it.value()<<std::endl;
 				NewDid(it.value());
 			}
-			Log::getLogger()->info("initIdCache  end");
+			DIDLog::info("initIdCache  end");
 			return true;
 		}
 
 
-		bool	CDidManager::RegisterCallback(const std::string &id, IIdManagerCallback *callback) {
-			Log::getLogger()->info("RegisterCallback  begin id {} callback {:p}", id, ( void* )callback);
+		bool CDidManager::RegisterCallback(const std::string &id, IIdManagerCallback *callback) {
+			DIDLog::info("RegisterCallback  begin id {} callback {:p}", id, ( void* )callback);
 
 
 			if (_idListenerMap.find(id) == _idListenerMap.end()) {
@@ -363,30 +243,29 @@ namespace Elastos {
 			}
 
 			_idListenerMap[id]->AddCallback(callback);
-			Log::getLogger()->info("RegisterCallback  end id {} callback {:p}", id, ( void* )callback);
+			DIDLog::info("RegisterCallback  end id {} callback {:p}", id, ( void* )callback);
 
 			return true;
 		}
 
 		bool CDidManager::UnregisterCallback(const std::string &id) {
-			Log::getLogger()->info("UnregisterCallback  begin id {} ", id);
+			DIDLog::info("UnregisterCallback  begin id {} ", id);
 
 			if (_idListenerMap.find(id) == _idListenerMap.end())
 				return false;
-			//?????????是不是 需要删除指针
 			_idListenerMap.erase(id);
-			Log::getLogger()->info("UnregisterCallback  end id {} ", id);
+			DIDLog::info("UnregisterCallback  end id {} ", id);
 
 			return true;
 		}
 
 		IDID *  CDidManager::NewDid(const std::string didNameStr) {
-			Log::getLogger()->debug("NewDid  begin didNameStr {} ", didNameStr);
+			DIDLog::debug("NewDid  begin didNameStr {} ", didNameStr);
 
 			CDid * idID = new  CDid(this, didNameStr);
 			_didMap[didNameStr] =  idID;
 			RegisterId(didNameStr);
-			Log::getLogger()->info("NewDid  end didNameStr {} ", didNameStr);
+			DIDLog::info("NewDid  end didNameStr {} ", didNameStr);
 
 			return idID;
 		}
@@ -415,30 +294,30 @@ namespace Elastos {
 		}
 		void CDidManager::SubWalletListener::FireCallbacks(const std::string &id, const std::string &path,
 														 const nlohmann::json &value) {
-			Log::getLogger()->info("FireCallbacks  begin didNameStr id {} path{} value{}", id , path, value.dump());
+			DIDLog::info("FireCallbacks  begin didNameStr id {} path{} value{}", id , path, value.dump());
 
 			std::for_each(_callbacks.begin(), _callbacks.end(), [&id, &path, &value](IIdManagerCallback *callback) {
 				callback->OnIdStatusChanged(id, path, value);
 			});
-			Log::getLogger()->info("FireCallbacks  end didNameStr id {} path{} value{}", id , path, value.dump());
+			DIDLog::info("FireCallbacks  end didNameStr id {} path{} value{}", id , path, value.dump());
 		}
 
 		void CDidManager::SubWalletListener::AddCallback(IIdManagerCallback *managerCallback) {
-			Log::getLogger()->info("AddCallback  begin didNameStr {:p} ", ( void* )managerCallback);
+			DIDLog::info("AddCallback  begin didNameStr {:p} ", ( void* )managerCallback);
 
 			if (std::find(_callbacks.begin(), _callbacks.end(), managerCallback) != _callbacks.end())
 				return;
 			_callbacks.push_back(managerCallback);
-			Log::getLogger()->info("AddCallback  end didNameStr {:p} ", ( void* )managerCallback);
+			DIDLog::info("AddCallback  end didNameStr {:p} ", ( void* )managerCallback);
 
 		}
 
 		void CDidManager::SubWalletListener::RemoveCallback(IIdManagerCallback *managerCallback) {
-			Log::getLogger()->info("RemoveCallback  begin didNameStr {:p} ", ( void* )managerCallback);
+			DIDLog::info("RemoveCallback  begin didNameStr {:p} ", ( void* )managerCallback);
 
 			_callbacks.erase(std::remove(_callbacks.begin(), _callbacks.end(), managerCallback), _callbacks.end());
 
-			Log::getLogger()->info("RemoveCallback  end didNameStr {:p} ", ( void* )managerCallback);
+			DIDLog::info("RemoveCallback  end didNameStr {:p} ", ( void* )managerCallback);
 
 		}
 	}

@@ -4,7 +4,7 @@
 
 #include "Interface/DIDManagerSupervisor.h"
 #include "didManager.h"
-#include "Log.h"
+#include "Common/DIDLog.h"
 #include "IDConfig.h"
 
 namespace Elastos {
@@ -17,7 +17,8 @@ namespace Elastos {
 
 		IDIDManager *
 		DIDManagerSupervisor::CreateDIDManager(ElaWallet::IMasterWallet *masterWallet, const std::string &rootPath) {
-			ElaWallet::Log::getLogger()->critical("libidchain.so version {}", IDCHAIN_VERSION_MESSAGE);
+			DIDLog::setLevel(spdlog::level::from_str(IDCHAIN_SPDLOG_LEVEL));
+			DIDLog::critical("DID version {}", IDCHAIN_VERSION_MESSAGE);
 			return new CDidManager(masterWallet, rootPath);
 		}
 

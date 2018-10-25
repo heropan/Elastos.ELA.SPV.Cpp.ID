@@ -19,12 +19,14 @@
 #include "Interface/ISubWalletCallback.h"
 #include "Interface/IMasterWallet.h"
 #include "Plugin/Interface/IMerkleBlock.h"
+#include "DIDSubWalletCallback.h"
+
 namespace Elastos {
 	namespace DID {
 		class SpvListener;
 
 
-		class CDidManager : public IDIDManager, public ElaWallet::ISubWalletCallback
+		class CDidManager : public IDIDManager
 		{
 		public:
 
@@ -45,40 +47,8 @@ namespace Elastos {
 			virtual bool  RegisterCallback(const std::string &id, IIdManagerCallback *callback);
 			virtual bool  UnregisterCallback(const std::string &id);
 
-			virtual void OnTransactionStatusChanged(
-				const std::string &txID,
-				const std::string &status,
-				const nlohmann::json &desc,
-				uint32_t blockHeight);
-
-			/**
-			 * Callback method fired when block begin synchronizing with a peer. This callback could be used to show progress.
-			 */
-			virtual void OnBlockSyncStarted();
-
-			/**
-			 * Callback method fired when best block chain height increased. This callback could be used to show progress.
-			 * @param currentBlockHeight is the of current block when callback fired.
-			 * @param progress is current progress when block height increased.
-			 */
-			virtual void OnBlockHeightIncreased(uint32_t currentBlockHeight, double progress);
-
-			/**
-			 * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
-			 */
-			virtual void OnBlockSyncStopped();
-
 		protected:
 			friend class SpvListener;
-
-/*
- * virtual void OnTransactionStatusChanged(
-					const std::string &txid,
-					const std::string &status,
-					const nlohmann::json &desc,
-					uint32_t confirms) = 0;
- * */
-
 
 			void updateDatabase(const std::string &id,
 								const std::string &path,
@@ -93,9 +63,9 @@ namespace Elastos {
 							  const std::string &path,
 							  uint32_t blockHeight);
 
-			void initSpvModule();
-
 			bool initIdCache();
+
+			void RegisterDIDSubWalletCallback();
 
 
 			void  RecoverIds(const std::vector<std::string> &ids, const std::vector<std::string> &keys,
@@ -149,6 +119,8 @@ namespace Elastos {
 			std::string _pathRoot;
 			IdCachePtr _idCache;
 
+			typedef std::map<std::string, DIDSubWalletCallback *> DIDSubWalletCallbackMap;
+			DIDSubWalletCallbackMap _didSubWalletCallbacks;
 
 			Elastos::ElaWallet::IMasterWallet*	_masterWallet;
 			//IIdAgent
